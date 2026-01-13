@@ -1,10 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import profile from "../assets/Profile.jpg";
 const styles = {
   sidebar: {
       width: "500px",  
-              // ⬅️ wider
-  minHeight: "520px",      // ⬅️ taller
+              
+  minHeight: "520px",      
     background: "#fff",
     borderRadius: "10px",
     border: "1px solid #2e1878ff",
@@ -91,7 +92,7 @@ const Leftsidebar = () => {
       <div style={styles.profileSection}
       onClick={()=>navigate("/Bio")}>
         <img
-          src="C:\Users\User\OneDrive\Documents\react_project\blogging\src\assets\Gemini_Generated_Image_n3kxnhn3kxnhn3kx.png"
+          src={profile}
           alt="Profile"
           style={styles.profileImg}
         />

@@ -1,7 +1,6 @@
 import React from 'react';
 // import styled from 'styled-components';
 // import PropTypes from 'prop-types';
-import Nav from '../Components/Navbar';
 import Leftsidebar from '../Components/Leftsidebar';
 import Feed from '../Components/Feed';
 import RightSidebar from '../Components/Rightsidebar';
@@ -25,18 +24,16 @@ const defaultProps = {};
 /**
  * 
  */
-const Home = () => {
+const Home = ({searchQuery}) => {
     return <div>
-        <div>
-            <Nav/>
-        </div>
+     
         <div className="container-fluid mt-4">
   <div className="row">
     <div className="col">
     <Leftsidebar />
   </div>
   <div className="col">
-           <Feed/>
+           <Feed searchQuery={searchQuery} />
           </div>
           <div className='col'>
             <RightSidebar />

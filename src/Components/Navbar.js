@@ -1,76 +1,131 @@
-import React from 'react';
-// import styled from 'styled-components';
-// import PropTypes from 'prop-types';
-import Notification from '../Pages/Notification';
-import { useNavigate } from 'react-router-dom';
-import Network from '../Pages/Network'; 
-// #region constants
+import React from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import postlyLogo from "../assets/postly-logo.png";
 
-// #endregion
-
-// #region styled-components
-
-// #endregion
-
-// #region functions
-
-// #endregion 
-
-// #region component
-const propTypes = {};
-
-const defaultProps = {};
-
-/**
- * 
- */
-const Nav = () => {
+const Nav = ({searchQuery, setSearchQuery}) => {
   const navigate = useNavigate();
-    return <div> 
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
-  <div className="container-fluid">
-    <a className="navbar-brand">Blogging App</a>
-    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span className="navbar-toggler-icon"></span>
-    </button>
-    <div className="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-        <li className="nav-item">
-          <a className="nav-link active" aria-current="page" href="/home">Home</a>
-        </li>
-       <li className="nav-item">
-          <span 
-          className="nav-link active" 
-          role="button" onClick={() => navigate("/network")}
-          >Networks</span>
-        </li>
-        <li className="nav-item">
-          <a className="nav-link active" aria-current="page" href="/">Message</a>
-        </li>
-        <li className="nav-item">
+const logout = () => {
+  localStorage.clear(); 
+  navigate("/");
+};
+  return (
+    <nav
+      className="navbar navbar-expand-lg shadow-sm"
+      style={{
+        height: "72px",
+        backgroundColor: "#ffffff",
+        padding: "0 24px",
+        fontSize: "20px",
+      }}
+    >
+      <div className="container-fluid">
+
+        {/* LOGO + NAME */}
+        <div
+          className="d-flex align-items-center"
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/home")}
+        >
+          <img
+            src={postlyLogo}
+            alt="Postly"
+            style={{
+              width: "100px",
+              height: "100px",
+              objectFit: "cover",
+            }}
+          />
+
           <span
-                className="nav-link active"
-                role="button"
-                onClick={() => navigate("/notifications")}
-              >Notifications</span>
-        </li>
-      </ul>
-      <form className="d-flex" role="search">
-        
-      <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-      
-        <button className="btn btn-outline-success" type="submit">Search</button>
-      </form> 
+            style={{
+              fontSize: "30px",
+              fontWeight: "600",
+              color: "#0a66c2",
+            }}
+          >
+            Postly
+          </span>
+        </div>
 
-      
-    </div>
-  </div>
-</nav>
-    </div>;
-}
+        {/* TOGGLER */}
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
 
-Nav.propTypes = propTypes;
-Nav.defaultProps = defaultProps;
-// #endregion
+        {/* NAV LINKS */}
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul className="navbar-nav ms-4 mb-2 mb-lg-0 gap-2">
+            <NavItem to="/home" label="Home" />
+            <NavItem to="/network" label="Network" />
+            <NavItem to="/messages" label="Messages" />
+            <NavItem to="/notifications" label="Notifications" />
+          </ul>
+
+          {/* SEARCH */}
+          <form className="d-flex ms-auto"
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <input
+              className="form-control me-2"
+              type="search"
+              placeholder="Search People or Posts"
+              style={{ width: "220px" }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button
+              className="btn"
+              style={{
+                backgroundColor: "#0a66c2",
+                color: "#fff",
+                border: "none",
+              }}
+              type="submit"
+            >
+              Search
+            </button>
+            <button
+    type="button"
+    className="btn ms-3"
+    onClick={logout}
+    style={{
+      backgroundColor: "transparent",
+      color: "#0a66c2",
+      border: "1px solid #0a66c2",
+      fontWeight: "500",
+    }}
+  >
+    Logout
+  </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+const NavItem = ({ to, label }) => (
+  <li className="nav-item">
+    <NavLink
+      to={to}
+      className="nav-link"
+      style={({ isActive }) => ({
+        fontWeight: "500",
+        color: isActive ? "#0a66c2" : "#555",
+        borderBottom: isActive ? "3px solid #0a66c2" : "3px solid transparent",
+        paddingBottom: "6px",
+      })}
+    >
+      {label}
+    </NavLink>
+  </li>
+);
 
 export default Nav;

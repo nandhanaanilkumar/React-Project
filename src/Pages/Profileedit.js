@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import Nav from '../Components/Navbar';
+import { useNavigate } from "react-router-dom";
+import React, { useState ,useEffect} from "react";
 const Profileedit= () => {
-   
+   const navigate = useNavigate();
   const MAX_BIO = 200;
 
   const [name, setName] = useState("");
@@ -22,11 +22,35 @@ const Profileedit= () => {
       setPhoto(URL.createObjectURL(file));
     }
   };
+
+  const handleSave = () => {
+  const profileData = {
+    name,
+    headline,
+    education,
+    bio,
+    photo,
+  };
+
+  localStorage.setItem("profileData", JSON.stringify(profileData));
+  navigate("/profile"); 
+};
+
+useEffect(() => {
+  const stored = JSON.parse(localStorage.getItem("profileData"));
+  if (stored) {
+    setName(stored.name || "");
+    setHeadline(stored.headline || "");
+    setEducation(stored.education || "");
+    setBio(stored.bio || "");
+    setPhoto(stored.photo || null);
+  }
+}, []);
+
   return (
     <div
     style={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}
     >
-      <Nav/>
       <div
 
       style={{
@@ -124,7 +148,7 @@ const Profileedit= () => {
       </div>
 
       {/* Save Button */}
-      <button className="btn btn-primary w-100">
+      <button className="btn btn-primary w-100" onClick={handleSave}>
         Save Changes
       </button>
     </div>

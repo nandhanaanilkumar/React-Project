@@ -4,7 +4,6 @@ import React from 'react';
 import Profile from '../Components/Profilecom';
 import Analytics from '../Components/Analytics';
 import Experience from '../Components/Experience';
-import Nav from '../Components/Navbar';
 // #region constants
 
 // #endregion
@@ -27,9 +26,7 @@ const defaultProps = {};
  */
 const Bio = () => {
     return <div>
-        <div>
-            <Nav></Nav>
-        </div>
+        
         <div>
             <Profile></Profile>
         </div>

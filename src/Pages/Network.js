@@ -1,12 +1,10 @@
 import NetworkSidebar from "../Components/Network/NetworkSidebar";
 import NetworkTab from "../Components/Network/NetworkTab";
 import InvitationCard from "../Components/Network/InvitationCard";
-import Navbar from "../Components/Navbar";
 import NetworkGrid from "../Components/Network/NetworkGrid";
 const Network = () => {
   return (
     <div>
-      <Navbar />
     <div
       style={{
         display: "grid",

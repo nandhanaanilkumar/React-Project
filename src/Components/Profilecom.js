@@ -1,33 +1,65 @@
-import React from "react";
 import {useNavigate} from "react-router-dom";
+import profile from "../assets/Profile.jpg";
+import React, { useEffect, useState } from "react";
+
 const styles = {
-cover: {
-    height: "100px",
+  cover: {
+    height: "120px",
     background: "linear-gradient(90deg, #0a66c2, #004182)",
+    borderTopLeftRadius: "10px",
+    borderTopRightRadius: "10px",
   },
-    profileSection: {
+
+  profileSection: {
     textAlign: "center",
-    padding: "0 15px 15px",
-    marginTop: "-55px",
-   
+    padding: "0 20px 20px",
+    marginTop: "-60px",
   },
-   profileImg: {
-    width: "110px",
-    height: "110px",
+
+  profileImg: {
+    width: "120px",
+    height: "120px",
     borderRadius: "50%",
-    border: "4px solid white",
-    background: "#fff",
-    objectFit: "cover"
+    border: "4px solid #ffffff",
+    backgroundColor: "#ffffff",
+    objectFit: "cover",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
   },
-   name: {
-    margin: "30px 0 2px",
-    fontSize: "20px",
+
+  name: {
+    marginTop: "30px",
+    marginBottom: "4px",
+    fontSize: "22px",
     fontWeight: "600",
+    color: "#222",
   },
-  
 };
+
 const Profile = () => {
   const navigate = useNavigate();
+  const [skills, setSkills] = useState([]);
+  useEffect(() => {
+    // Fetch skills from localStorage or API
+    const storedSkills = JSON.parse(localStorage.getItem("profileSkills")) ;
+    if (storedSkills) setSkills(storedSkills);
+    else {
+      setSkills(["React", "Node.js", "Bootstrap"]);
+    }
+  }, []);
+
+  const addSkill = () => {
+  const newSkill = prompt("Enter a skill");
+  if (!newSkill) return;
+
+  const updatedSkills = [...skills, newSkill];
+  setSkills(updatedSkills);
+  localStorage.setItem(
+    "profileSkills",
+    JSON.stringify(updatedSkills)
+  );
+};
+
+
   return (
     <div className="bg-light py-4">
       <div className="container">
@@ -39,7 +71,7 @@ const Profile = () => {
         {/* Profile Card */}
       <div style={styles.profileSection}>
     <img
-      src="C:\\Users\\User\\OneDrive\\Documents\\react_project\\blogging\\src\\assets\\Gemini_Generated_Image_n3kxnhn3kxnhn3kx.png"
+      src={profile}
       alt="Profile"
       style={styles.profileImg}
     />
@@ -75,22 +107,51 @@ const Profile = () => {
             {/* About */}
             <div className="card mt-4">
               <div className="card-body">
-                <h6>About</h6>
-                <p className="text-muted small">
+                <h5>About</h5>
+                <p className="text-muted small" style={{ fontSize: "20px" }}>
                   Passionate developer building modern web applications.
                 </p>
               </div>
             </div>
 
-            {/* Skills */}
-            <div className="card mt-3">
-              <div className="card-body">
-                <h6>Skills</h6>
-                <span className="badge bg-primary me-2">React</span>
-                <span className="badge bg-success me-2">Node.js</span>
-                <span className="badge bg-warning text-dark me-2">Bootstrap</span>
-              </div>
-            </div>
+          {/* Skills */}
+<div className="card mt-4" style={{ padding: "10px" }}>
+  <div className="card-body" style={{ padding: "20px" }}>
+    
+    <div className="d-flex justify-content-between align-items-center mb-3">
+      <h5 style={{ fontWeight: "600", fontSize: "20px" }}>
+        Skills
+      </h5>
+
+      <button
+        className="btn btn-sm btn-outline-primary"
+        style={{ fontSize: "14px", padding: "6px 14px" }}
+        onClick={addSkill}
+      >
+        + Add
+      </button>
+    </div>
+
+    <div className="mt-3">
+      {skills.map((skill, index) => (
+        <span
+          key={index}
+          className="badge bg-primary me-3 mb-3"
+          style={{
+            fontSize: "15px",
+            padding: "8px 14px",
+            borderRadius: "20px",
+          }}
+        >
+          {skill}
+        </span>
+      ))}
+    </div>
+
+  </div>
+</div>
+
+
 
           </div>
         </div>

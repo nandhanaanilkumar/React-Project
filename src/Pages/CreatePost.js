@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Nav from "../Components/Navbar";
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -64,7 +63,6 @@ const handleMediaChange = (e) => {
 
   return (
     <>
-      <Nav />
 
       <div className="container mt-5">
         <div className="row justify-content-center">

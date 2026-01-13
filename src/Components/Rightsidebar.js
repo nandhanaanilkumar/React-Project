@@ -45,15 +45,14 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    fontSize: "15px",
+    fontSize: "20px",
     cursor: "pointer",
   },
 
   photo: { color: "#378fe9" },
   video: { color: "#5f9b41" },
   article: { color: "#e06847" },
-  poll: { color: "#8b5cf6" },
-  event: { color: "#f59e0b" },
+  
 
   divider: {
     borderTop: "1px solid #eee",
@@ -61,13 +60,13 @@ const styles = {
   },
 
   sectionTitle: {
-    fontSize: "22px",
+    fontSize: "24px",
     fontWeight: "600",
     marginBottom: "8px",
   },
 
   listItem: {
-    fontSize: "15px",
+    fontSize: "18px",
     color: "#555",
     marginBottom: "6px",
     cursor: "pointer",
@@ -106,21 +105,38 @@ const RightSidebar = () => {
         <div style={{ ...styles.actionBtn, ...styles.article }}>📝 Article</div>
       </div>
 
-      {/* Secondary Actions */}
-      <div style={{ ...styles.actions, marginTop: "8px" }}>
-        <div style={{ ...styles.actionBtn, ...styles.poll }}>📊 Poll</div>
-        <div style={{ ...styles.actionBtn, ...styles.event }}>📅 Event</div>
-      </div>
+     
 
       <div style={styles.divider}></div>
 
-      {/* Suggested Actions */}
-      <div>
-        <div style={styles.sectionTitle}>Quick actions</div>
-        <div style={styles.listItem}>✍️ Write a blog</div>
-        <div style={styles.listItem}>🎙️ Go live</div>
-        <div style={styles.listItem}>📌 Create a series</div>
-      </div>
+      {/* Postly News */}
+<div>
+  <div style={styles.sectionTitle}>Postly News</div>
+
+  <div
+    style={styles.listItem}
+    onClick={() => navigate("/news")}
+  >
+    📰 React 19 improves rendering performance
+  </div>
+
+  <div
+    style={styles.listItem}
+    onClick={() => navigate("/news")}
+  >
+    📰 AI skills dominate tech hiring in 2026
+  </div>
+
+  <div
+    style={styles.listItem}
+    onClick={() => navigate("/news")}
+  >
+    📰 Remote work trends continue to rise
+  </div>
+
+</div>
+
+<div style={styles.divider}></div>
 
       <div style={styles.divider}></div>
 
@@ -144,7 +160,7 @@ const RightSidebar = () => {
       <div>
         <div style={styles.sectionTitle}>Your activity</div>
         <div style={styles.listItem} onClick={() => navigate("/drafts")}>📄 Saved drafts</div>
-        <div style={styles.listItem}>🔖 Bookmarked posts</div>
+        <div style={styles.listItem} onClick={()=> navigate("/bookmarks")}>🔖 Bookmarked posts</div>
         <div style={styles.listItem}>📊 Post analytics</div>
       </div>
     </aside>

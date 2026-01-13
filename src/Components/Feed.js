@@ -1,4 +1,4 @@
-import React,{ useState}from "react";
+import React,{ useState,useEffect}from "react";
 import CommentBox from "./Comment/CommentBox";  
 import CommentItem from "./Comment/CommentItem";
 const styles = { 
@@ -78,8 +78,21 @@ const styles = {
     padding: "6px 12px",
     borderRadius: "6px",
   },
+  commentSection: {
+  marginTop: "10px",
+  paddingTop: "8px",
+  borderTop: "1px solid #eee",
+},
+
+commentList: {
+  marginTop: "8px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "6px",
+},
+
 };
-const Feed = () => {
+const Feed = ({searchQuery}) => {
 const [posts, setPosts] = useState([
   {
     id: 1,
@@ -89,8 +102,9 @@ const [posts, setPosts] = useState([
     text: "🚀 Just published a new blog on React performance optimization. Sharing some real-world tips!",
     image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
     liked: false,
+    bookmarked: false,
 comments: [],
-showCommentBox: false
+showCommentBox: true
 
   },
   {
@@ -101,8 +115,9 @@ showCommentBox: false
     text: "Writing clean code is not about being clever — it’s about being readable.",
     image: null, 
     liked: false,
+    bookmarked: false,
 comments: [],
-showCommentBox: false
+showCommentBox: true
 
   },
   {
@@ -113,11 +128,15 @@ showCommentBox: false
     text: "📸 Captured this while working late on my blogging platform project!",
     image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
 liked: false,
+bookmarked: false,
     comments: [],
-showCommentBox: false
+showCommentBox: true
     
   },
 ]);
+useEffect(() => {
+  localStorage.setItem("posts", JSON.stringify(posts));
+}, [posts]);
 
 
   const toggleLike = (id) => {
@@ -148,7 +167,7 @@ const addComment = (postId, text) => {
               ...post.comments,
               { id: Date.now(), text },
             ],
-            showCommentBox: false,
+            showCommentBox: true,
           }
         : post
     )
@@ -170,11 +189,45 @@ const deleteComment = (postId, commentId) => {
   );
 };
 
+const toggleBookmark = (post) => {
+  const savedPosts =
+    JSON.parse(localStorage.getItem("bookmarkedPosts")) || [];
 
+  const isAlreadySaved = savedPosts.find(p => p.id === post.id);
+
+  let updatedSavedPosts;
+
+  if (isAlreadySaved) {
+    updatedSavedPosts = savedPosts.filter(p => p.id !== post.id);
+  } else {
+    updatedSavedPosts = [...savedPosts, post];
+  }
+
+  localStorage.setItem(
+    "bookmarkedPosts",
+    JSON.stringify(updatedSavedPosts)
+  );
+};
+
+
+const storedPosts =
+  JSON.parse(localStorage.getItem("posts")) || posts;
+
+const filteredPosts = searchQuery
+  ? storedPosts.filter(
+      (post) =>
+        post.text
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        post.name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
+    )
+  : posts;
 
   return (
     <div style={styles.feed}>
-      {posts.map((post) => (
+      {filteredPosts.map((post) => (
         <div key={post.id} style={styles.postCard}>
 
           {/* Header */}
@@ -193,54 +246,55 @@ const deleteComment = (postId, commentId) => {
           {post.image && (
             <img src={post.image} alt="post" style={styles.postImage} />
           )}
+{/* Actions */}
+<div style={styles.actions}>
+  <div
+    className={`btn btn-sm ${
+      post.liked ? "btn-primary" : "btn-outline-secondary"
+    }`}
+    style={styles.actionBtn}
+    onClick={() => toggleLike(post.id)}
+  >
+    👍 Like
+  </div>
 
-          {/* Actions */}
-          <div style={styles.actions}>
- <div
-            className={`btn btn-sm ${
-              post.liked ? "btn-primary" : "btn-outline-secondary"
-            }`}
-            style={styles.actionBtn}
-            onClick={() => toggleLike(post.id)}
-          >
-            <i
-              className={
-                post.liked
-                  ? "bi bi-hand-thumbs-up-fill"
-                  : "bi bi-hand-thumbs-up"
-              }
-              style={{ marginRight: "6px" }}
-            />
-            Like
-          </div>
-{/* Comment button */}
-<div
+  <div
+    className="btn btn-outline-secondary btn-sm"
+    style={styles.actionBtn}
+    onClick={() => toggleCommentBox(post.id)}
+  >
+    💬 Comment ({post.comments.length})
+  </div>
+
+  <div className="btn btn-outline-secondary btn-sm" style={styles.actionBtn}>
+    Share
+  </div>
+
+  <div
   className="btn btn-outline-secondary btn-sm"
   style={styles.actionBtn}
-  onClick={() => toggleCommentBox(post.id)}
+  onClick={() => toggleBookmark(post)}
 >
-  💬 Comment ({post.comments.length})
+  🔖 Save
 </div>
 
-{/* Comment input section */}
-{post.showCommentBox && (
-  <CommentBox
-    onAdd={(text) => addComment(post.id, text)}
-  />
-)}
 
-{/* Comments list */}
-{post.comments.map((comment) => (
-  <CommentItem
-    key={comment.id}
-    text={comment.text}
-    onDelete={() =>
-      deleteComment(post.id, comment.id)
-    }
-  />
-))}
-            <div className="btn btn-outline-secondary btn-sm" style={styles.actionBtn}>Share</div>
-          </div>
+</div>
+{/* Comment input BELOW post */}
+{post.showCommentBox && (
+  <div style={styles.commentSection}>
+    <CommentBox onAdd={(text) => addComment(post.id, text)} />
+  </div>
+)}
+<div style={styles.commentList}>
+  {post.comments.map((comment) => (
+    <CommentItem
+      key={comment.id}
+      text={comment.text}
+      onDelete={() => deleteComment(post.id, comment.id)}
+    />
+  ))}
+</div>
 
         </div>
       ))}
