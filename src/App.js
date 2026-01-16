@@ -19,6 +19,9 @@ import BookmarkedPosts from './Pages/BookmarkedPosts';
 import { useState } from 'react';
 import Nav from './Components/Navbar';
 import MessagesPage from './Pages/MessagesPage';
+import UserManagementPage from './Pages/UserManagementPage';
+import CommentModerationPage from './Pages/CommentModerationPage';
+import AnalyticsPage from './Pages/AnalyticsPage';
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
@@ -29,7 +32,11 @@ function App() {
       "/verify-otp", 
       "/reset-password",
       "/admin/posts",
-      "/admindashboard"
+      "/admindashboard",
+      "/usermanagementpage",
+      "/commentmoderationpage",
+      "/analytics"
+
     ];
   const hideNavbar = hideNavbarPaths.includes(location.pathname);
   return (
@@ -56,6 +63,9 @@ function App() {
 <Route path="/drafts" element={<Drafts />} />
 <Route path="/bookmarks" element={<BookmarkedPosts />} />
      <Route path="/messages" element={<MessagesPage />} />
+     <Route path="/usermanagementpage" element={<UserManagementPage />} />
+     <Route path="/commentmoderationpage" element={<CommentModerationPage />} />
+    <Route path='/analytics' element={<AnalyticsPage />} />
       </Routes>
     </div>
 

@@ -33,7 +33,7 @@ const Profileedit= () => {
   };
 
   localStorage.setItem("profileData", JSON.stringify(profileData));
-  navigate("/profile"); 
+  navigate("/Bio"); 
 };
 
 useEffect(() => {

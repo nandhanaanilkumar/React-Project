@@ -40,8 +40,8 @@ const Registration = () => {
       <div className="row gx-5 align-items-center justify-content-center">
         <div className="col-lg-6 mb-5 text-center">
           <h1 className="my-5 display-3 fw-bold ls-tight mt-3">
-            The best offer <br />
-            <span className="text-primary">for your business</span>
+            Share Your Story <br />
+            <span className="text-primary">With the world</span>
           </h1>
          <p style={{ color: 'hsl(217, 10%, 50.8%)' }}>
   Share your thoughts, ideas, and experiences through meaningful blog posts.
