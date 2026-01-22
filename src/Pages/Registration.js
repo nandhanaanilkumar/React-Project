@@ -55,7 +55,6 @@ const Registration = () => {
           <div className="card mt-3">
             <div className="card-body py-5 px-md-5 justify-content-center">
               <form onSubmit={handleSubmit}>
-                {/* <!-- 2 column grid layout with text inputs for the first and last names --> */}
                 <div className="row">
                   <div className="col-md-6 mb-4">
                     <div data-mdb-input-init className="form-outline">
