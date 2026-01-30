@@ -1,39 +1,52 @@
 import React from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-// import styled from 'styled-components';
-// import PropTypes from 'prop-types';
 
-// #region constants
 
-// #endregion
-
-// #region styled-components
-
-// #endregion
-
-// #region functions
-
-// #endregion
-
-// #region component
-const propTypes = {};
-
-const defaultProps = {};
-
-/**
- * 
- */
 const Registration = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        navigate('/');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!passwordRegex.test(password)) {
+      setError(
+        "Password must be 8+ chars with uppercase, lowercase, number & special character"
+      );
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    const userData = {
+      firstName,
+      lastName,
+      email,
+      password,
     };
+
+    localStorage.setItem("registeredUser", JSON.stringify(userData));
+    navigate("/");
+  };
+
 
     return <div>
        <section className="hero-section mb-5 d-flex align-items-center justify-content-center " style={{minHeight: '100vh', width: '100%', backgroundColor: '#f5f5f5'}}>
 
+        {error && <div className="alert alert-danger">{error}</div>}
 
   <div className="px-4 py-5 px-md-5 text-center text-lg-start" style={{backgroundColor: 'hsl(0, 0%, 96%)'}}>
     <div className="container">
@@ -54,59 +67,76 @@ const Registration = () => {
         <div className="col-lg-6 mb-5 mb-lg-0 text-center">
           <div className="card mt-3">
             <div className="card-body py-5 px-md-5 justify-content-center">
+               <h3 className="text-primary mb-3">Create Account</h3>
               <form onSubmit={handleSubmit}>
                 <div className="row">
                   <div className="col-md-6 mb-4">
                     <div data-mdb-input-init className="form-outline">
-                      <input type="text" id="form3Example1" className="form-control" />
-                      <label className="form-label" for="form3Example1">First name</label>
+                          <input
+            type="text"
+            className="form-control mb-3"
+            placeholder="First Name"
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
                     </div>
                   </div>
                   <div className="col-md-6 mb-4">
                     <div data-mdb-input-init className="form-outline">
-                      <input type="text" id="form3Example2" className="form-control" />
-                      <label className="form-label" for="form3Example2">Last name</label>
+                     <input
+            type="text"
+            className="form-control mb-3"
+            placeholder="Last Name"
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
                     </div>
                   </div>
                 </div>
 
                 {/* <!-- Email input --> */}
                 <div data-mdb-input-init className="form-outline mb-4">
-                  <input type="email" id="form3Example3" className="form-control" />
-                  <label className="form-label" for="form3Example3">Email address</label>
+                   <input
+            type="email"
+            className="form-control mb-3"
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          
                 </div>
 
                 {/* <!-- Password input --> */}
                 <div data-mdb-input-init className="form-outline mb-4">
-                  <input type="password" id="form3Example4" className="form-control" />
-                  <label className="form-label" for="form3Example4">Password</label>
-                </div>      
+                   <input
+            type="password"
+            className="form-control mb-2"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
+          
+                </div>      
+ 
+                {/* <!-- Confirm Password input --> */}
+                <div data-mdb-input-init className="form-outline mb-4">
+                   <input
+            type="password"
+            className="form-control mb-3"
+            placeholder="Confirm Password"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          <small className="text-muted">
+            Password must contain uppercase, lowercase, number & special character
+          </small>
+                </div>
                 {/* <!-- Submit button --> */}
                 <button type="submit" data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-block mb-4">
                   Sign up
                 </button>
 
-                {/* <!-- Register buttons --> */}
-                <div className="text-center">
-                  <p>or sign up with:</p>
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                    <i className="fab fa-facebook-f"></i>
-                  </button>
-
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                    <i className="fab fa-google"></i>
-                  </button>
-
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                    <i className="fab fa-twitter"></i>
-                  </button>
-
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init className="btn btn-link btn-floating mx-1">
-                    <i className="fab fa-github"></i>
-                  </button>
-
-                </div>
                 <p className="text-center mt-3">Already have an account? <Link to="/">Sign in</Link></p>
               </form>
             </div>
@@ -119,8 +149,5 @@ const Registration = () => {
     </div>;
 }
 
-Registration.propTypes = propTypes;
-Registration.defaultProps = defaultProps;
-// #endregion
 
 export default Registration;

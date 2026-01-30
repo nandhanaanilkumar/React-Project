@@ -16,19 +16,28 @@ const [showForgot, setShowForgot] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+      const savedUser = JSON.parse(localStorage.getItem("registeredUser"));
+
   // change route if needed
   if(email===ADMIN_EMAIL && password===ADMIN_PASSWORD){
     console.log("Admin logged in");
     navigate("/admindashboard");
     return;
   }
-  if(email===USER_EMAIL && password===USER_PASSWORD)
+  if (
+    savedUser &&
+    email === savedUser.email &&
+    password === savedUser.password
+  )   
   {
-    console.log("User logged in");
     setError("");
     navigate("/home");
     return;
-  }
+  }else if(email===USER_EMAIL && password===USER_PASSWORD){
+    console.log("Default user logged in");
+    navigate("/home");
+    return;
+  } 
     setError("Invalid email or password");
 
   };
