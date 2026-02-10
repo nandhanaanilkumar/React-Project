@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ForgotPasswordModal from "../Pages/ForgotPasswordModal";
-
+import axios from "axios";
 const Login = () => {
   const navigate = useNavigate();
 const [error, setError] = useState("");
@@ -9,38 +9,35 @@ const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
 const [showForgot, setShowForgot] = useState(false);
 
-  const ADMIN_EMAIL="admin@blog.com";
-  const ADMIN_PASSWORD="admin123";
-  const USER_EMAIL="user@blog.com";
-  const USER_PASSWORD="user123";
+  
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-      const savedUser = JSON.parse(localStorage.getItem("registeredUser"));
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
 
-  // change route if needed
-  if(email===ADMIN_EMAIL && password===ADMIN_PASSWORD){
-    console.log("Admin logged in");
-    navigate("/admindashboard");
-    return;
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/login",
+      { email, password }
+    );
+
+    const user = response.data.user;
+
+    // Save logged-in user
+    localStorage.setItem("loggedInUser", JSON.stringify(user));
+
+    // Redirect based on role
+    if (user.role === "admin") {
+      navigate("/admindashboard");
+    } else {
+      navigate("/home");
+    }
+
+  } catch (err) {
+    setError(err.response?.data?.message || "Invalid email or password");
   }
-  if (
-    savedUser &&
-    email === savedUser.email &&
-    password === savedUser.password
-  )   
-  {
-    setError("");
-    navigate("/home");
-    return;
-  }else if(email===USER_EMAIL && password===USER_PASSWORD){
-    console.log("Default user logged in");
-    navigate("/home");
-    return;
-  } 
-    setError("Invalid email or password");
+};
 
-  };
 
   return (
     <section

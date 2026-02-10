@@ -37,9 +37,11 @@ const styles = {
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [skills, setSkills] = useState([]);
+  const [user, setUser] = useState(null);
+const [skills, setSkills] = useState([]);
+
   useEffect(() => {
-    // Fetch skills from localStorage or API
+  
     const storedSkills = JSON.parse(localStorage.getItem("profileSkills")) ;
     if (storedSkills) setSkills(storedSkills);
     else {
@@ -76,19 +78,27 @@ const Profile = () => {
       style={styles.profileImg}
     />
 <div>
-            <h4 style={styles.name}>John Doe</h4>
-            <p className="text-muted mb-1">Full Stack Developer</p>
-            <p className="text-secondary small">📍 Harvard University</p>
-
+            <h4 style={styles.name}>
+  {user?.firstName || "User"}
+</h4>
+<p className="text-muted mb-1">
+  {user?.headline || "Add your professional headline"}
+</p>
+<p className="text-secondary small">
+  📍 {user?.education || "Add your education"}
+</p>
             {/* Stats */}
             <div className="row text-center mt-3">
               <div className="col">
-                <h6>120</h6>
-                <small className="text-muted">Followers</small>
+           <h6>{followersCount}</h6>
+<small>Followers</small>
+
+
               </div>
               <div className="col">
-                <h6>85</h6>
-                <small className="text-muted">Following</small>
+                
+<h6>{followingCount}</h6>
+<small>Following</small>
               </div>
               <div className="col">
                 <h6>42</h6>

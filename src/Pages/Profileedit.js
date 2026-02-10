@@ -23,27 +23,30 @@ const Profileedit= () => {
     }
   };
 
-  const handleSave = () => {
-  const profileData = {
-    name,
+ const handleSave = () => {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  const updatedUser = {
+    ...user,
     headline,
     education,
     bio,
-    photo,
+    profileImage: photo,
   };
 
-  localStorage.setItem("profileData", JSON.stringify(profileData));
-  navigate("/Bio"); 
+  localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+  navigate("/Bio");
 };
 
 useEffect(() => {
-  const stored = JSON.parse(localStorage.getItem("profileData"));
-  if (stored) {
-    setName(stored.name || "");
-    setHeadline(stored.headline || "");
-    setEducation(stored.education || "");
-    setBio(stored.bio || "");
-    setPhoto(stored.photo || null);
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  if (user) {
+    setName(user.firstName || "");
+    setHeadline(user.headline || "");
+    setEducation(user.education || "");
+    setBio(user.bio || "");
+    setPhoto(user.profileImage || null);
   }
 }, []);
 

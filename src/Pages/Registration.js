@@ -17,7 +17,7 @@ const Registration = () => {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!passwordRegex.test(password)) {
@@ -31,16 +31,19 @@ const Registration = () => {
       setError("Passwords do not match");
       return;
     }
-
-    const userData = {
+try {
+    const userData = await axios.post("http://localhost:5000/register",{
       firstName,
       lastName,
       email,
-      password,
-    };
-
-    localStorage.setItem("registeredUser", JSON.stringify(userData));
+      password
+    });
+alert(userData.data.message);
     navigate("/");
+  } catch (err){
+    console.log(err.res);
+    setError(err?.response?.data?.message || "Registration failed"); 
+  }
   };
 
 
