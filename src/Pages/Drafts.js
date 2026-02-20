@@ -4,22 +4,37 @@ import { useNavigate } from "react-router-dom";
 const Drafts = () => {
   const [drafts, setDrafts] = useState([]);
   const navigate = useNavigate();
+useEffect(() => {
 
-  useEffect(() => {
-    setDrafts(JSON.parse(localStorage.getItem("drafts")) || []);
-  }, []);
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
-  const deleteDraft = (id) => {
-    const updated = drafts.filter((d) => d.id !== id);
-    localStorage.setItem("drafts", JSON.stringify(updated));
-    setDrafts(updated);
-  };
+  fetch(`http://localhost:5000/drafts/${loggedUser.id}`)
+    .then(res => res.json())
+    .then(data => setDrafts(data));
 
-  const publishDraft = (draft) => {
-    console.log("Published:", draft);
-    deleteDraft(draft.id);
-    alert("🚀 Draft published!");
-  };
+}, []);
+
+
+ const deleteDraft = async (id) => {
+
+  await fetch(`http://localhost:5000/draft/${id}`, {
+    method: "DELETE"
+  });
+
+  setDrafts(drafts.filter(d => d._id !== id));
+};
+
+  const publishDraft = async (draft) => {
+
+  await fetch(`http://localhost:5000/publish/${draft._id}`, {
+    method: "PUT"
+  });
+
+  alert("🚀 Draft published");
+
+  setDrafts(drafts.filter(d => d._id !== draft._id));
+};
+
 
   const editDraft = (draftId) => {
   localStorage.setItem("editDraftId", draftId);
@@ -37,7 +52,7 @@ const Drafts = () => {
 
       {drafts.map((draft) => (
         <div
-          key={draft.id}
+          key={draft._id}
           className="card mb-4 shadow-sm border-0"
           style={{ borderRadius: "12px" }}
         >
@@ -70,7 +85,7 @@ const Drafts = () => {
             <div className="d-flex gap-2">
               <button
                 className="btn btn-outline-primary btn-sm"
-                onClick={() => editDraft(draft.id)}
+                onClick={() => editDraft(draft._id)}
               >
                 ✏️ Edit
               </button>
@@ -84,7 +99,7 @@ const Drafts = () => {
 
               <button
                 className="btn btn-outline-danger btn-sm"
-                onClick={() => deleteDraft(draft.id)}
+                onClick={() => deleteDraft(draft._id)}
               >
                 Delete
               </button>

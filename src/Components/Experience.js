@@ -2,57 +2,61 @@ import React, { useEffect, useState } from "react";
 
 const Experience = () => {
   const [experiences, setExperiences] = useState([]);
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
-  // Load from localStorage
-  useEffect(() => {
-    const stored =
-      JSON.parse(localStorage.getItem("experiences")) || [];
-    setExperiences(stored);
+   useEffect(() => {
+
+    if (!loggedUser?.id) return;
+
+    fetch(`http://localhost:5000/experience/${loggedUser.id}`)
+      .then(res => res.json())
+      .then(data => setExperiences(data));
+
   }, []);
 
-  // Save to localStorage
-  const saveExperiences = (data) => {
-    setExperiences(data);
-    localStorage.setItem("experiences", JSON.stringify(data));
-  };
+  const addExperience = async () => {
 
-  // Add Experience
-  const addExperience = () => {
     const role = prompt("Role");
     const company = prompt("Company / Organization");
-    const duration = prompt("Duration (e.g. Jan 2024 – May 2024)");
+    const duration = prompt("Duration");
     const description = prompt("Description");
 
     if (!role || !company) return;
 
-    const newExp = {
-      id: Date.now(),
-      role,
-      company,
-      duration,
-      description,
-    };
+    const res = await fetch(
+      `http://localhost:5000/experience/${loggedUser.id}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role, company, duration, description })
+      }
+    );
 
-    saveExperiences([...experiences, newExp]);
+    const updated = await res.json();
+    setExperiences(updated);
   };
+   // Edit Experience
+  const editExperience = async (exp, index) => {
 
-  // Edit Experience
-  const editExperience = (exp) => {
     const role = prompt("Role", exp.role);
     const company = prompt("Company", exp.company);
     const duration = prompt("Duration", exp.duration);
     const description = prompt("Description", exp.description);
 
-    const updated = experiences.map((e) =>
-      e.id === exp.id
-        ? { ...e, role, company, duration, description }
-        : e
+    const res = await fetch(
+      `http://localhost:5000/experience/${loggedUser.id}/${index}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role, company, duration, description })
+      }
     );
 
-    saveExperiences(updated);
+    const updated = await res.json();
+    setExperiences(updated);
   };
 
-  return (
+   return (
     <div className="bg-light py-4">
       <div className="container">
         <div className="row justify-content-center">
@@ -61,9 +65,8 @@ const Experience = () => {
             <div className="card shadow-sm">
               <div className="card-body">
 
-                {/* Header */}
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h5 className="mb-0">Experience</h5>
+                <div className="d-flex justify-content-between mb-3">
+                  <h5>Experience</h5>
                   <button
                     className="btn btn-sm btn-outline-primary"
                     onClick={addExperience}
@@ -72,21 +75,20 @@ const Experience = () => {
                   </button>
                 </div>
 
-                {/* Experience List */}
                 {experiences.length === 0 && (
                   <p className="text-muted small">
                     No experience added yet.
                   </p>
                 )}
 
-                {experiences.map((exp) => (
-                  <div key={exp.id} className="mb-3">
+                {experiences.map((exp, index) => (
+                  <div key={index} className="mb-3">
 
                     <div className="d-flex justify-content-between">
-                      <h6 className="mb-0">{exp.role}</h6>
+                      <h6>{exp.role}</h6>
                       <button
                         className="btn btn-sm btn-link"
-                        onClick={() => editExperience(exp)}
+                        onClick={() => editExperience(exp, index)}
                       >
                         Edit
                       </button>
@@ -96,7 +98,7 @@ const Experience = () => {
                       {exp.company}
                     </small>
 
-                    <p className="text-muted small mb-1">
+                    <p className="small text-muted mb-1">
                       {exp.duration}
                     </p>
 

@@ -4,7 +4,8 @@ const Profileedit= () => {
    const navigate = useNavigate();
   const MAX_BIO = 200;
 
-  const [name, setName] = useState("");
+const [firstName, setFirstName] = useState("");
+const [lastName, setLastName] = useState("");
   const [headline, setHeadline] = useState("");
   const [bio, setBio] = useState("");
   const [photo, setPhoto] = useState(null);
@@ -16,39 +17,95 @@ const Profileedit= () => {
     }
   };
 
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setPhoto(URL.createObjectURL(file));
-    }
+ const handlePhotoChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onloadend = () => {
+    setPhoto(reader.result); 
   };
 
- const handleSave = () => {
-  const user = JSON.parse(localStorage.getItem("loggedInUser"));
-
-  const updatedUser = {
-    ...user,
-    headline,
-    education,
-    bio,
-    profileImage: photo,
-  };
-
-  localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
-  navigate("/Bio");
+  reader.readAsDataURL(file);
 };
 
-useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+const handleSave = async () => {
 
-  if (user) {
-    setName(user.firstName || "");
-    setHeadline(user.headline || "");
-    setEducation(user.education || "");
-    setBio(user.bio || "");
-    setPhoto(user.profileImage || null);
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  if (!loggedUser || !loggedUser.id) {
+    alert("User not found");
+    return;
   }
+
+  const response = await fetch(
+    `http://localhost:5000/updateProfile/${loggedUser.id}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        headline,
+        education,
+        bio,
+        profileImage: photo
+      })
+    }
+  );
+
+  const updatedUser = await response.json();
+
+  // 🔥 Keep id stable
+  localStorage.setItem(
+    "loggedInUser",
+    JSON.stringify({
+      id: updatedUser._id,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
+      email: updatedUser.email,
+      role: updatedUser.role
+    })
+  );
+
+  navigate("/bio");
+};
+
+
+
+useEffect(() => {
+
+  const fetchProfile = async () => {
+
+    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    if (!loggedUser || !loggedUser.id) {
+      console.log("User ID missing");
+      return;
+    }
+
+    const res = await fetch(
+      `http://localhost:5000/profile/${loggedUser.id}`
+    );
+
+    const data = await res.json();
+
+    setFirstName(data.firstName || "");
+    setLastName(data.lastName || "");
+    setHeadline(data.headline || "");
+    setEducation(data.education || "");
+    setBio(data.bio || "");
+    setPhoto(data.profileImage || null);
+  };
+
+  fetchProfile();
+
 }, []);
+
+
+
+
 
   return (
     <div
@@ -99,14 +156,25 @@ useEffect(() => {
 
       {/* Name */}
       <div style={{ marginBottom: "15px" }}>
-        <label>Name</label>
-        <input
-          type="text"
-          className="form-control"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
+  <label>First Name</label>
+  <input
+    type="text"
+    className="form-control"
+    value={firstName}
+    onChange={(e) => setFirstName(e.target.value)}
+  />
+</div>
+
+<div style={{ marginBottom: "15px" }}>
+  <label>Last Name</label>
+  <input
+    type="text"
+    className="form-control"
+    value={lastName}
+    onChange={(e) => setLastName(e.target.value)}
+  />
+</div>
+
 
       {/* Headline */}
       <div style={{ marginBottom: "15px" }}>

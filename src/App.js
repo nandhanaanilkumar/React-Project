@@ -22,6 +22,8 @@ import MessagesPage from './Pages/MessagesPage';
 import UserManagementPage from './Pages/UserManagementPage';
 import CommentModerationPage from './Pages/CommentModerationPage';
 import AnalyticsPage from './Pages/AnalyticsPage';
+import FollowersPage from './Pages/FollowersPage';
+import FollowingPage from './Pages/FollowingPage';
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
@@ -66,6 +68,8 @@ function App() {
      <Route path="/usermanagementpage" element={<UserManagementPage />} />
      <Route path="/commentmoderationpage" element={<CommentModerationPage />} />
     <Route path='/analytics' element={<AnalyticsPage />} />
+    <Route path="/followers" element={<FollowersPage />} />
+    <Route path="/following" element={<FollowingPage />} />
       </Routes>
     </div>
 

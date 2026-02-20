@@ -1,5 +1,6 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate} from "react-router-dom";
+import { useState } from "react";
 const styles = {
   sidebar: {
       width: "500px",  
@@ -91,28 +92,54 @@ const styles = {
 
 const Leftsidebar = () => {
   const navigate = useNavigate();
+const [user, setUser] = useState(null);    
+    useEffect(() => {
+    const fetchProfile = async () => {
+      const loggedUser = JSON.parse(
+        localStorage.getItem("loggedInUser")
+      );
+
+      if (!loggedUser) return;
+
+      const res = await fetch(
+        `http://localhost:5000/profile/${loggedUser.id}`
+      );
+
+      const data = await res.json();
+      setUser(data);
+    };
+
+    fetchProfile();
+  }, []);
   return (
     <div style={styles.wrapper}>
     <aside style={styles.sidebar}>
       {/* Cover */}
       <div style={styles.cover}></div>
 
-      {/* Profile */}
-      <div style={styles.profileSection}
-      onClick={()=>navigate("/Bio")}>
-        <img
-          src="C:\Users\User\OneDrive\Documents\react_project\blogging\src\assets\Gemini_Generated_Image_n3kxnhn3kxnhn3kx.png"
-          alt="Profile"
-          style={styles.profileImg}
-        />
+      <div
+  style={styles.profileSection}
+  onClick={() => navigate("/Bio")}
+>
+  <img
+    src={user?.profileImage || "/default-profile.png"}
+    alt="Profile"
+    style={styles.profileImg}
+  />
 
-        <h4 style={styles.name}>John Doe</h4>
+
+         <h4 style={styles.name}>
+    {user?.firstName} {user?.lastName}
+  </h4>
        
-        <p style={styles.headline}>CEO & Founder | linkedin| Grow and Learn</p>
 
-        <p style={styles.location}>Harvard University</p>
-      </div>
-
+  <p style={styles.headline}>
+    {user?.headline || "Add headline"}
+  </p>
+          <p style={styles.location}>
+    {user?.education || "Add education"}
+  </p>
+</div>
       <hr style={styles.hr} />
 
       {/* Stats */}

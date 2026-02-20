@@ -17,15 +17,54 @@ const [fileError, setFileError] = useState("");
     }
   }, []);
 
-  const saveDraft = () => {
-    if (media && media instanceof File) {
-      const reader = new FileReader();
-      reader.onloadend = () => storeDraft(reader.result);
-      reader.readAsDataURL(media);
-    } else {
-      storeDraft(media);
-    }
-  };
+  const saveDraft = async () => {
+
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  let mediaUrl = null;
+
+  if (media) {
+    const reader = new FileReader();
+
+    reader.onloadend = async () => {
+
+      mediaUrl = reader.result;
+
+      await fetch("http://localhost:5000/draft", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: loggedUser.id,
+          text: content,
+          mediaUrl
+        })
+      });
+
+      alert("Draft saved");
+      navigate("/drafts");
+    };
+
+    reader.readAsDataURL(media);
+
+  } else {
+
+    await fetch("http://localhost:5000/draft", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: loggedUser.id,
+        text: content,
+        mediaUrl: null
+      })
+    });
+
+    alert("Draft saved");
+    navigate("/drafts");
+  }
+};
+
 
   const storeDraft = (mediaUrl) => {
     const draft = {
@@ -42,10 +81,57 @@ const [fileError, setFileError] = useState("");
     navigate("/drafts");
   };
 
-  const handlePost = () => {
-    console.log("Posted:", { content, media });
-    navigate("/Home");
-  };
+  const handlePost = async () => {
+
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  if (!loggedUser?.id) {
+    alert("User not found");
+    return;
+  }
+
+  let mediaUrl = null;
+
+  if (media) {
+    const reader = new FileReader();
+
+    reader.onloadend = async () => {
+
+      mediaUrl = reader.result;
+
+      await fetch("http://localhost:5000/createPost", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: loggedUser.id,
+          text: content,
+          mediaUrl
+        })
+      });
+
+      navigate("/home");
+    };
+
+    reader.readAsDataURL(media);
+
+  } else {
+
+    await fetch("http://localhost:5000/createPost", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: loggedUser.id,
+        text: content,
+        mediaUrl: null
+      })
+    });
+
+    navigate("/home");
+  }
+};
+
 const handleMediaChange = (e) => {
   const file = e.target.files[0];
   if (!file) return;

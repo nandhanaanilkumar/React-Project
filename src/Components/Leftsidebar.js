@@ -1,4 +1,6 @@
 import React from "react";
+import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 import profile from "../assets/Profile.jpg";
 const styles = {
@@ -83,6 +85,20 @@ const styles = {
 
 const Leftsidebar = () => {
   const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+ useEffect(() => {
+
+    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    if (!loggedUser?.id) return;
+
+    fetch(`http://localhost:5000/profile/${loggedUser.id}`)
+      .then(res => res.json())
+      .then(data => setUser(data))
+      .catch(err => console.log(err));
+
+  }, []);
+
   return (
     <aside style={styles.sidebar}>
       {/* Cover */}
@@ -91,18 +107,23 @@ const Leftsidebar = () => {
       {/* Profile */}
       <div style={styles.profileSection}
       onClick={()=>navigate("/Bio")}>
-        <img
-          src={profile}
+       <img
+          src={user?.profileImage || profile}
           alt="Profile"
           style={styles.profileImg}
         />
 
-        <h4 style={styles.name}>John Doe</h4>
-       
-        <p style={styles.headline}>CEO & Founder | linkedin| Grow and Learn</p>
-
-        <p style={styles.location}>Harvard University</p>
-      </div>
+<h4 style={styles.name}>
+          {user
+            ? `${user.firstName || ""} ${user.lastName || ""}`
+            : "Loading..."}
+        </h4>       
+   <p style={styles.headline}>
+          {user?.headline || "Add your professional headline"}
+        </p>
+<p style={styles.location}>
+          {user?.education || "Add your education"}
+        </p>      </div>
 
       <hr style={styles.hr} />
 

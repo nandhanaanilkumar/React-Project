@@ -4,6 +4,8 @@ import React from 'react';
 import Profile from '../Components/Profilecom';
 import Analytics from '../Components/Analytics';
 import Experience from '../Components/Experience';
+import ProfilePosts from "../Components/ProfilePosts";
+
 // #region constants
 
 // #endregion
@@ -35,6 +37,9 @@ const Bio = () => {
         </div>
         <div>
             <Experience></Experience>
+        </div>
+        <div>
+            <ProfilePosts></ProfilePosts>
         </div>
     </div>;
 }

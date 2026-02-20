@@ -135,8 +135,25 @@ showCommentBox: true
   },
 ]);
 useEffect(() => {
-  localStorage.setItem("posts", JSON.stringify(posts));
-}, [posts]);
+  
+  const fetchFeed = async () => {
+
+    const loggedUser = JSON.parse(
+      localStorage.getItem("loggedInUser")
+    );
+
+    const res = await fetch(
+      `http://localhost:5000/feed/${loggedUser.id}`
+    );
+
+    const data = await res.json();
+
+    setPosts(data);
+  };
+
+  fetchFeed();
+
+}, []);
 
 
   const toggleLike = (id) => {
@@ -156,6 +173,7 @@ const toggleCommentBox = (id) => {
     )
   );
 };
+
 
 const addComment = (postId, text) => {
   setPosts(prev =>

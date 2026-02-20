@@ -39,29 +39,94 @@ const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 const [skills, setSkills] = useState([]);
+const [followersCount, setFollowersCount] = useState(0);
+const [followingCount, setFollowingCount] = useState(0);
+const [postCount, setPostCount] = useState(0);
 
-  useEffect(() => {
-  
-    const storedSkills = JSON.parse(localStorage.getItem("profileSkills")) ;
-    if (storedSkills) setSkills(storedSkills);
-    else {
-      setSkills(["React", "Node.js", "Bootstrap"]);
-    }
-  }, []);
+useEffect(() => {
 
-  const addSkill = () => {
+  const fetchProfile = async () => {
+
+    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (!loggedUser) return;
+
+    const res = await fetch(
+      `http://localhost:5000/profile/${loggedUser.id}`
+    );
+
+    const data = await res.json();
+
+    setUser(data);
+    setSkills(data.skills || []);
+
+  };
+
+  fetchProfile();
+  fetchFollowers();
+  fetchPostCount();
+}, []);
+
+
+
+const addSkill = async () => {
+
   const newSkill = prompt("Enter a skill");
   if (!newSkill) return;
 
   const updatedSkills = [...skills, newSkill];
-  setSkills(updatedSkills);
-  localStorage.setItem(
-    "profileSkills",
-    JSON.stringify(updatedSkills)
+
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  const response = await fetch(
+    `http://localhost:5000/updateProfile/${loggedUser.id}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        skills: updatedSkills
+      })
+    }
   );
+
+  const updatedUser = await response.json();
+
+  setSkills(updatedUser.skills);
 };
 
+const fetchFollowers = async () => {
+  const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
+  const res1 = await fetch(
+    `http://localhost:5000/followers/${loggedUser.id}`
+  );
+
+  const followers = await res1.json();
+
+  setFollowersCount(followers.length);
+
+  const res2 = await fetch(
+    `http://localhost:5000/following/${loggedUser.id}`
+  );
+
+  const following = await res2.json();
+
+  setFollowingCount(following.length);
+};
+const fetchPostCount = async () => {
+  const loggedUser = JSON.parse(
+    localStorage.getItem("loggedInUser")
+  );
+
+  if (!loggedUser) return;
+
+  const res = await fetch(
+    `http://localhost:5000/userPosts/${loggedUser.id}`
+  );
+
+  const posts = await res.json();
+
+  setPostCount(posts.length);
+};
   return (
     <div className="bg-light py-4">
       <div className="container">
@@ -73,8 +138,8 @@ const [skills, setSkills] = useState([]);
         {/* Profile Card */}
       <div style={styles.profileSection}>
     <img
-      src={profile}
-      alt="Profile"
+     src={user?.profileImage || profile} 
+     alt="Profile"
       style={styles.profileImg}
     />
 <div>
@@ -90,18 +155,28 @@ const [skills, setSkills] = useState([]);
             {/* Stats */}
             <div className="row text-center mt-3">
               <div className="col">
-           <h6>{followersCount}</h6>
+         <h6
+  style={{ cursor: "pointer", color: "#0a66c2" }}
+  onClick={() => navigate("/followers")}
+>
+  {followersCount}
+</h6>
 <small>Followers</small>
 
 
               </div>
               <div className="col">
                 
-<h6>{followingCount}</h6>
+<h6
+  style={{ cursor: "pointer", color: "#0a66c2" }}
+  onClick={() => navigate("/following")}
+>
+  {followingCount}
+</h6>
 <small>Following</small>
               </div>
               <div className="col">
-                <h6>42</h6>
+<h6>{postCount}</h6>
                 <small className="text-muted">Posts</small>
               </div>
             </div>
@@ -118,9 +193,10 @@ const [skills, setSkills] = useState([]);
             <div className="card mt-4">
               <div className="card-body">
                 <h5>About</h5>
-                <p className="text-muted small" style={{ fontSize: "20px" }}>
-                  Passionate developer building modern web applications.
-                </p>
+                <p className="text-muted small" style={{ fontSize: "18px" }}>
+  {user?.bio || "Add something about yourself"}
+</p>
+
               </div>
             </div>
 
@@ -160,9 +236,6 @@ const [skills, setSkills] = useState([]);
 
   </div>
 </div>
-
-
-
           </div>
         </div>
       </div>

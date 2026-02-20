@@ -1,21 +1,21 @@
 import PeopleCard from "./PeopleCard";
-
+import { useEffect, useState } from "react";
 const NetworkGrid = () => {
-  const people = [
-    { id: 1, name: "John Doe", role: "Frontend Developer" },
-    { id: 2, name: "Jane Smith", role: "Backend Engineer" },
-    { id: 3, name: "Alex Brown", role: "UI/UX Designer" },
-    { id: 4, name: "Emily Clark", role: "Content Writer" },
-    { id: 5, name: "Michael Lee", role: "DevOps Specialist" },
-    { id: 6, name: "Sarah Wilson", role: "Product Manager" },
-    { id: 7, name: "David Kim", role: "Data Scientist" },
-    { id: 8, name: "Laura Martinez", role: "Marketing Expert" },
-        { id: 9, name: "Michael Lee", role: "DevOps Specialist" },
-    { id: 10, name: "Sarah Wilson", role: "Product Manager" },
-    { id: 11, name: "David Kim", role: "Data Scientist" },
-    { id: 12, name: "Laura Martinez", role: "Marketing Expert" },
+  const [people, setPeople] = useState([]);
 
-  ];
+useEffect(() => {
+
+  const loggedUser = JSON.parse(
+    localStorage.getItem("loggedInUser")
+  );
+
+  fetch(`http://localhost:5000/people/${loggedUser.id}`)
+    .then(res => res.json())
+    .then(data => setPeople(data));
+
+}, []);
+
+
 
   return (
     <div>
@@ -26,9 +26,16 @@ const NetworkGrid = () => {
         gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
         gap: "20px"
       }}>
-        {people.map(p => (
-          <PeopleCard key={p.id} name={p.name} role={p.role} />
-        ))}
+       {people.map(p => (
+  <PeopleCard
+    key={p._id}
+    id={p._id}
+    name={`${p.firstName} ${p.lastName}`}
+    role={p.headline}
+    profileImage={p.profileImage}
+  />
+))}
+
       </div>
     </div>
   );

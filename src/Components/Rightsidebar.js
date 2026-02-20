@@ -84,11 +84,7 @@ const RightSidebar = () => {
     <aside style={styles.sidebar}>
       {/* Start Post */}
       <div style={styles.header}>
-        <img
-          src="https://via.placeholder.com/100"
-          alt="user"
-          style={styles.avatar}
-        />
+    
         <input
           type="text"
           placeholder="Start a post"
@@ -100,9 +96,9 @@ const RightSidebar = () => {
 
       {/* Primary Actions */}
       <div style={styles.actions}>
-        <div style={{ ...styles.actionBtn, ...styles.photo }}>📷 Photo</div>
-        <div style={{ ...styles.actionBtn, ...styles.video }}>🎥 Video</div>
-        <div style={{ ...styles.actionBtn, ...styles.article }}>📝 Article</div>
+        <div style={{ ...styles.actionBtn, ...styles.photo }} onClick={() => navigate("/createpost")}>📷 Photo</div>
+        <div style={{ ...styles.actionBtn, ...styles.video }} onClick={() => navigate("/createpost")}>🎥 Video</div>
+        <div style={{ ...styles.actionBtn, ...styles.article }} onClick={() => navigate("/createpost")}>📝 Article</div>
       </div>
 
      
