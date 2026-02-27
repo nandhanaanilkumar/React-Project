@@ -1,29 +1,20 @@
 import React from 'react';
-// import styled from 'styled-components';
-// import PropTypes from 'prop-types';
-
-// #region constants
-
-// #endregion
-
-// #region styled-components
-
-// #endregion
-
-// #region functions
-
-// #endregion
-
-// #region component
-const propTypes = {};
-
-const defaultProps = {};
-
-/**
- * 
- */
+import axios from 'axios';
+import { useEffect, useState } from "react";
 const Usertable = () => {
-    
+     const [users, setUsers] = useState([]);
+
+  const fetchUsers = async () => {
+    const res = await axios.get(
+      "http://localhost:5000/admin/users"
+    );
+    setUsers(res.data);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return (
     <div style={{
       background: "#fff",
@@ -39,31 +30,26 @@ const Usertable = () => {
             <th>Name</th>
             <th>Email</th>
             <th>Status</th>
-            <th>Action</th>
           </tr>
         </thead>
-
         <tbody>
-          <tr>
-            <td>John Doe</td>
-            <td>john@mail.com</td>
-            <td>Active</td>
-            <td>🚫 Ban</td>
-          </tr>
-          <tr>
-            <td>Jane Smith</td>
-            <td>jane@mail.com</td>
-            <td>Active</td>
-            <td>🚫 Ban</td>
-          </tr>
+          {users.map((u) => (
+            <tr key={u._id}>
+              <td>
+                {u.firstName} {u.lastName}
+              </td>
+
+              <td>{u.email}</td>
+
+              <td>{u.status || "Active"}</td>
+
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
   );
 };
 
-Usertable.propTypes = propTypes;
-Usertable.defaultProps = defaultProps;
-// #endregion
 
 export default Usertable;

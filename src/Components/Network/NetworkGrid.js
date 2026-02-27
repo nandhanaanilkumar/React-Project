@@ -1,42 +1,53 @@
-import PeopleCard from "./PeopleCard";
-import { useEffect, useState } from "react";
-const NetworkGrid = () => {
-  const [people, setPeople] = useState([]);
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-useEffect(() => {
-
-  const loggedUser = JSON.parse(
-    localStorage.getItem("loggedInUser")
-  );
-
-  fetch(`http://localhost:5000/people/${loggedUser.id}`)
-    .then(res => res.json())
-    .then(data => setPeople(data));
-
-}, []);
-
-
+const NetworkGrid = ({ people }) => {
+  const navigate = useNavigate();
 
   return (
-    <div>
-      <h5>People you may know</h5>
-
-      <div style={{
+    <div
+      style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-        gap: "20px"
-      }}>
-       {people.map(p => (
-  <PeopleCard
-    key={p._id}
-    id={p._id}
-    name={`${p.firstName} ${p.lastName}`}
-    role={p.headline}
-    profileImage={p.profileImage}
-  />
-))}
+        gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))",
+        gap: "20px",
+        marginTop: "20px",
+      }}
+    >
+      {people.map((user) => (
+        <div
+          key={user._id}
+          style={{
+            background: "#fff",
+            padding: "15px",
+            borderRadius: "10px",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+            cursor: "pointer",
+            textAlign: "center",
+          }}
+      onClick={() => navigate(`/profile/${user._id}`)}        >
+          <img
+            src={
+              user.profileImage ||
+              "https://via.placeholder.com/80"
+            }
+            alt=""
+            style={{
+              width: "70px",
+              height: "70px",
+              borderRadius: "50%",
+              objectFit: "cover",
+            }}
+          />
 
-      </div>
+          <h5 style={{ marginTop: "10px" }}>
+            {user.firstName} {user.lastName}
+          </h5>
+
+          <p style={{ color: "#666", fontSize: "14px" }}>
+            {user.headline}
+          </p>
+        </div>
+      ))}
     </div>
   );
 };

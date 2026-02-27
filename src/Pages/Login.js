@@ -136,7 +136,6 @@ const [showForgot, setShowForgot] = useState(false);
           Forgot password?
         </span>
       </div>
-                  {showForgot && (<ForgotPasswordModal onClose={() => setShowForgot(false)} />)}  
                     
                   <div>
                     <a href="/registration">Don't have an account? Sign Up</a>
@@ -148,6 +147,7 @@ const [showForgot, setShowForgot] = useState(false);
 
         </div>
       </div>
+    {showForgot && (<ForgotPasswordModal onClose={() => setShowForgot(false)} />)}  
     </section>
   );
 };

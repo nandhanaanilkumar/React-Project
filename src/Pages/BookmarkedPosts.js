@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import CommentItem from "../Components/Comment/CommentItem";
 const styles = {
   navbar: {
     height: "60px",
@@ -77,16 +78,62 @@ const styles = {
     marginTop: "80px",
     color: "#666",
   },
+  actions: {
+  display: "flex",
+  justifyContent: "space-around",
+  borderTop: "1px solid #eee",
+  paddingTop: "10px",
+  marginTop: "10px",
+  fontSize: "14px",
+  color: "#555",
+},
+
+commentList: {
+  marginTop: "8px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "6px",
+},
+commentItem: {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: "8px",
+},
+
+commentAvatar: {
+  width: "30px",
+  height: "30px",
+  borderRadius: "50%",
+  objectFit: "cover",
+},
+
+commentBubble: {
+  background: "#f3f2ef",
+  padding: "6px 10px",
+  borderRadius: "10px",
+},
+
+commentName: {
+  fontWeight: "600",
+  fontSize: "13px",
+},
 };
 
 const BookmarkedPosts = () => {
   const [savedPosts, setSavedPosts] = useState([]);
 
-  useEffect(() => {
+useEffect(() => {
+  const load = () => {
     const stored =
       JSON.parse(localStorage.getItem("bookmarkedPosts")) || [];
     setSavedPosts(stored);
-  }, []);
+  };
+
+  load();
+  window.addEventListener("storage", load);
+
+  return () => window.removeEventListener("storage", load);
+}, []);
 
   return (
     <>
@@ -104,8 +151,7 @@ const BookmarkedPosts = () => {
               {/* Header */}
               <div style={styles.cardHeader}>
                 <img
-                  src={post.avatar}
-                  alt="user"
+src={post.avatar || "https://via.placeholder.com/100"}                  alt="user"
                   style={styles.avatar}
                 />
                 <div>
@@ -123,8 +169,33 @@ const BookmarkedPosts = () => {
                   alt="post"
                   style={styles.image}
                 />
+                
               )}
+             {/* Actions — SAME AS FEED */}
+<div style={styles.actions}>
+  👍 Like ({post.likesCount || 0})
+  <span>💬 Comment ({post.comments?.length || 0})</span>
+  <span>🔖 Saved</span>
+</div>
+
+{/* Comments — SAME AS FEED */}
+<div style={styles.commentList}>
+  {(post.comments || []).map((comment) => (
+    <CommentItem
+      key={comment._id || comment.id}
+      text={comment.text}
+      name={`${comment.userId?.firstName || ""} ${
+        comment.userId?.lastName || ""
+      }`}
+      avatar={
+        comment.userId?.profileImage ||
+        "https://via.placeholder.com/40"
+      }
+    />
+  ))}
+</div>
             </div>
+            
           ))
         )}
       </div>

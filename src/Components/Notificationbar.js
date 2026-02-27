@@ -1,5 +1,5 @@
 import React from "react";
-
+import { useState, useEffect } from "react";
 const styles = {
   container: {
     width: "100%",
@@ -60,50 +60,43 @@ const styles = {
   },
 };
 
-const notifications = [
-  {
-    id: 1,
-    name: "John Doe",
-    avatar: "https://via.placeholder.com/100",
-    message: "👍 liked your post",
-    time: "2 minutes ago",
-    type: "like",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    avatar: "https://via.placeholder.com/100",
-    message: "💬 commented: “Great insights, thanks for sharing!”",
-    time: "20 minutes ago",
-    type: "comment",
-  },
-  {
-    id: 3,
-    name: "Alex Johnson",
-    avatar: "https://via.placeholder.com/100",
-    message: "📢 shared your post",
-    time: "1 hour ago",
-    type: "share",
-  },
-  {
-    id: 4,
-    name: "Emily Clark",
-    avatar: "https://via.placeholder.com/100",
-    message: "📝 published a new blog post",
-    time: "3 hours ago",
-    type: "post",
-  },
-  {
-    id: 5,
-    name: "Michael Lee",
-    avatar: "https://via.placeholder.com/100",
-    message: "❤️ loved your blog on React optimization",
-    time: "1 day ago",
-    type: "like",
-  },
-];
 
 const Notifications = () => {
+  const [notifications, setNotifications] = useState([]);
+
+useEffect(() => {
+
+  const fetchNotifications = async () => {
+
+    const loggedUser =
+      JSON.parse(localStorage.getItem("loggedInUser"));
+
+    const res = await fetch(
+      `http://localhost:5000/notifications/${loggedUser.id}`
+    );
+
+    const data = await res.json();
+
+    const formatted = data.map(n => ({
+      id: n._id,
+      name:
+        `${n.senderId?.firstName || ""} ${
+          n.senderId?.lastName || ""
+        }`,
+      avatar:
+        n.senderId?.profileImage ||
+        "https://via.placeholder.com/100",
+      message: n.message,
+      type: n.type,
+      time: new Date(n.createdAt).toLocaleString(),
+    }));
+
+    setNotifications(formatted);
+  };
+
+  fetchNotifications();
+
+}, []);
   return (
     <div style={styles.container}>
       {notifications.map((note) => (

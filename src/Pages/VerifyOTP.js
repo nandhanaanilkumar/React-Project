@@ -1,31 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const VerifyOTP = () => {
+const VerifyOTP = ({ email, onVerified }) => {
   const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(60);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (timer <= 0) return;
+    const interval = setInterval(() => {
+      setTimer(prev => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timer]);
 
   const verifyOtp = async () => {
-    await fetch("/api/verify-otp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ otp }),
+    const res = await fetch("http://localhost:5000/verify-otp", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json"},
+      body: JSON.stringify({ email, otp }),
     });
 
-    alert("OTP Verified");
+    const data = await res.json();
+
+    if(res.ok){
+      onVerified(); // go next page
+    } else {
+      setError(data.message);
+    }
   };
 
   return (
-    <div className="container mt-5">
-      <h3>Verify OTP</h3>
+    <div className="container mt-5" style={{maxWidth:"400px"}}>
+      <div className="card p-4 shadow">
+        <h3 className="text-center">Verify OTP</h3>
+        <p className="text-muted text-center">
+          OTP sent to {email}
+        </p>
 
-      <input
-        className="form-control my-3"
-        placeholder="Enter OTP"
-        onChange={(e) => setOtp(e.target.value)}
-      />
+        <input
+          className="form-control my-3"
+          placeholder="Enter OTP"
+          value={otp}
+          onChange={(e)=>setOtp(e.target.value)}
+        />
 
-      <button className="btn btn-success" onClick={verifyOtp}>
-        Verify
-      </button>
+        <p className="text-center text-muted">Expires in {timer}s</p>
+
+        {error && <p className="text-danger">{error}</p>}
+
+        <button className="btn btn-success w-100" onClick={verifyOtp}>
+          Verify OTP
+        </button>
+      </div>
     </div>
   );
 };

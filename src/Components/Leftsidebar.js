@@ -5,17 +5,17 @@ import { useNavigate } from "react-router-dom";
 import profile from "../assets/Profile.jpg";
 const styles = {
   sidebar: {
-      width: "500px",  
-              
+      width: "500px",           
   minHeight: "520px",      
     background: "#fff",
     borderRadius: "10px",
-    border: "1px solid #2e1878ff",
+    border: "1px solid #004182",
     position: "sticky",
     top: "80px",
     fontFamily: "Arial, sans-serif",
     overflow: "hidden",
-    marginLeft: "130px"
+    marginLeft: "130px",
+    padding: "12px",
   },
   cover: {
     height: "100px",
@@ -37,16 +37,16 @@ const styles = {
   },
   name: {
     margin: "30px 0 2px",
-    fontSize: "20px",
+    fontSize: "28px",
     fontWeight: "600",
   },
   headline: {
-    fontSize: "18px",
+    fontSize: "20px",
     color: "#555",
     margin: "30px 0 2px"
   },
   location: {
-    fontSize: "15px",
+    fontSize: "20px",
     color: "#777",
   },
   hr: {
@@ -60,7 +60,7 @@ const styles = {
   statRow: {
     display: "flex",
     justifyContent: "space-between",
-    fontSize: "16px",
+    fontSize: "20px",
     marginBottom: "8px",
     cursor: "pointer",
   },
@@ -70,7 +70,7 @@ const styles = {
   },
   premium: {
     padding: "10px 15px",
-    fontSize: "15px",
+    fontSize: "18px",
     cursor: "pointer",
   },
   items: {
@@ -78,7 +78,7 @@ const styles = {
     alignItems: "center",
     gap: "8px",
     padding: "10px 15px",
-    fontSize: "16px",
+    fontSize: "20px",
     cursor: "pointer",
   },
 };

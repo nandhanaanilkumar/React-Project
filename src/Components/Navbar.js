@@ -1,13 +1,53 @@
 import React from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import postlyLogo from "../assets/postly-logo.png";
-
+import { useLocation } from "react-router-dom";
 const Nav = ({searchQuery, setSearchQuery}) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [updates, setUpdates] = useState({
+  newPosts: 0,
+  newMessages: 0,
+  newNotifications: 0,
+  newNetwork: 0,
+});
 const logout = () => {
   localStorage.clear(); 
   navigate("/");
 };
+const markAsRead = (type) => {
+  setUpdates(prev => ({
+    ...prev,
+    [type]: 0,
+  }));
+};
+useEffect(() => {
+
+  const fetchUpdates = async () => {
+
+    const user =
+      JSON.parse(localStorage.getItem("loggedInUser"));
+
+    if (!user) return;
+
+    const res = await fetch(
+      `http://localhost:5000/updates/${user.id}`
+    );
+
+    const data = await res.json();
+
+    setUpdates(data);
+  };
+
+  fetchUpdates();
+
+  const interval = setInterval(fetchUpdates, 10000);
+
+  return () => clearInterval(interval);
+
+}, []);
+
   return (
     <nav
       className="navbar navbar-expand-lg shadow-sm"
@@ -60,10 +100,33 @@ const logout = () => {
         {/* NAV LINKS */}
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ms-4 mb-2 mb-lg-0 gap-2">
-            <NavItem to="/home" label="Home" />
-            <NavItem to="/network" label="Network" />
-            <NavItem to="/messages" label="Messages" />
-            <NavItem to="/notifications" label="Notifications" />
+        <NavItem
+  to="/home"
+  label="Home"
+  count={updates.newPosts}
+  onRead={() => markAsRead("newPosts")}
+/>
+
+<NavItem
+  to="/network"
+  label="Network"
+  count={updates.newNetwork}
+  onRead={() => markAsRead("newNetwork")}
+/>
+
+<NavItem
+  to="/messages"
+  label="Messages"
+  count={updates.newMessages}
+  onRead={() => markAsRead("newMessages")}
+/>
+
+<NavItem
+  to="/notifications"
+  label="Notifications"
+  count={updates.newNotifications}
+  onRead={() => markAsRead("newNotifications")}
+/>
           </ul>
 
           {/* SEARCH */}
@@ -77,9 +140,13 @@ const logout = () => {
               type="search"
               placeholder="Search People or Posts"
               style={{ width: "220px" }}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+              value={searchQuery?.text || ""}
+onChange={(e) =>
+  setSearchQuery({
+    text: e.target.value,
+    page: location.pathname,
+  })
+}            />
             <button
               className="btn"
               style={{
@@ -111,21 +178,42 @@ const logout = () => {
   );
 };
 
-const NavItem = ({ to, label }) => (
-  <li className="nav-item">
+const NavItem = ({ to, label, count, onRead }) => (
+  <li className="nav-item position-relative">
+
     <NavLink
       to={to}
       className="nav-link"
+      onClick={onRead}   // ⭐ THIS REMOVES BADGE
       style={({ isActive }) => ({
         fontWeight: "500",
         color: isActive ? "#0a66c2" : "#555",
-        borderBottom: isActive ? "3px solid #0a66c2" : "3px solid transparent",
+        borderBottom: isActive
+          ? "3px solid #0a66c2"
+          : "3px solid transparent",
         paddingBottom: "6px",
       })}
     >
       {label}
     </NavLink>
+
+    {count > 0 && (
+      <span
+        style={{
+          position: "absolute",
+          top: "2px",
+          right: "-8px",
+          background: "red",
+          color: "#fff",
+          borderRadius: "50%",
+          fontSize: "11px",
+          padding: "2px 6px",
+          fontWeight: "600",
+        }}
+      >
+        {count}
+      </span>
+    )}
   </li>
 );
-
 export default Nav;

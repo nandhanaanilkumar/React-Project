@@ -66,7 +66,7 @@ const styles = {
   },
 
   listItem: {
-    fontSize: "18px",
+    fontSize: "20px",
     color: "#555",
     marginBottom: "6px",
     cursor: "pointer",

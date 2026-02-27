@@ -184,8 +184,7 @@ const fetchPostCount = async () => {
             {/* Actions */}
             <div className="d-flex justify-content-center gap-2 mt-4">
               <button className="btn btn-primary btn-sm" onClick={()=> navigate("/profileedit")}>Edit Profile</button>
-              <button className="btn btn-outline-secondary btn-sm">Share</button>
-            </div>
+     </div>
           </div>
         </div>
 

@@ -24,6 +24,7 @@ import CommentModerationPage from './Pages/CommentModerationPage';
 import AnalyticsPage from './Pages/AnalyticsPage';
 import FollowersPage from './Pages/FollowersPage';
 import FollowingPage from './Pages/FollowingPage';
+import ViewProfile from './Pages/ViewProfile';
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
@@ -54,8 +55,10 @@ function App() {
         <Route path="/Bio" element={<Bio />} />
         <Route path="/notifications" element={<Notification />}></Route>
         <Route path="/admindashboard" element={<AdminDashboard />}></Route>
-        <Route path="/network" element={<Network />}></Route>
-        <Route path="/network/invitations" element={<NetworkInvitations />}></Route>
+<Route
+  path="/network"
+  element={<Network searchQuery={searchQuery} />}
+/>        <Route path="/network/invitations" element={<NetworkInvitations />}></Route>
         <Route path="/profileedit" element={<Profileedit />}></Route>
         <Route path="/createpost" element={<CreatePost />}></Route>
 <Route path="/admin/posts" element={<AdminPostsPage />} />
@@ -70,6 +73,7 @@ function App() {
     <Route path='/analytics' element={<AnalyticsPage />} />
     <Route path="/followers" element={<FollowersPage />} />
     <Route path="/following" element={<FollowingPage />} />
+     <Route path="/profile/:id" element={<ViewProfile />} />
       </Routes>
     </div>
 

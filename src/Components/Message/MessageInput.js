@@ -21,6 +21,9 @@ const MessageInput = ({ onSend }) => {
       <button style={styles.button} onClick={send}>
         Send
       </button>
+      <button onClick={() => setText(text + "😊")}>
+  😀
+</button>
     </div>
   );
 };

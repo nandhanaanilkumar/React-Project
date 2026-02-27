@@ -1,15 +1,31 @@
-const PostActions = ({ post }) => {
-  const deletePost = () => {
-    if (window.confirm("Delete this post?")) {
-      console.log("Soft delete:", post.id);
-    }
+import {
+  deletePost,
+  hidePost,
+  warnPost,
+} from "../Services/AdminPostApi";
+
+const PostActions = ({ post, refresh }) => {
+
+  const handleDelete = async () => {
+    await deletePost(post.id);
+    refresh();
+  };
+
+  const handleHide = async () => {
+    await hidePost(post.id);
+    refresh();
+  };
+
+  const handleWarn = async () => {
+    await warnPost(post.id);
+    refresh();
   };
 
   return (
     <>
-      <button onClick={deletePost}>Delete</button>
-      <button>Hide</button>
-      <button>Warn</button>
+      <button onClick={handleDelete}>Delete</button>
+      <button onClick={handleHide}>Hide</button>
+      <button onClick={handleWarn}>Warn</button>
       <button>Preview</button>
     </>
   );

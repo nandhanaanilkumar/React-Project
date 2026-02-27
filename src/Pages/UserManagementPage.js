@@ -1,43 +1,71 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminSidebar from "../Components/Admin/Adminsidebar";
 import AdminTopbar from "../Components/Admin/Admintopbar";
+import axios from "axios";
 
 const UserManagementPage = () => {
-  const [users] = useState([
-    { id: 1, name: "John Doe", email: "john@gmail.com", role: "Author", status: "Active" },
-    { id: 2, name: "Admin User", email: "admin@gmail.com", role: "Admin", status: "Active" }
-  ]);
 
+  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("All");
+
+  const fetchUsers = async () => {
+    const res = await axios.get(
+      "http://localhost:5000/admin/users"
+    );
+    setUsers(res.data);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // ⭐ LinkedIn-style filtering
+  const filteredUsers = users.filter(u => {
+
+    const fullName =
+      `${u.firstName || ""} ${u.lastName || ""}`.toLowerCase();
+
+    const matchesSearch =
+      fullName.includes(search.toLowerCase()) ||
+      u.email?.toLowerCase().includes(search.toLowerCase());
+
+const matchesRole =
+  roleFilter === "All" ||
+  (u.role || "").toLowerCase() === roleFilter.toLowerCase();
+
+    return matchesSearch && matchesRole;
+  });
+console.log(users);
   return (
     <>
-      {/* REQUIRED STYLES */}
       <style>{`
         .admin-layout {
-          display: flex;
-          height: 100vh;
-          background-color: #f1f5f9;
+          display:flex;
+          height:100vh;
+          background:#f1f5f9;
         }
         .admin-main {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
+          flex:1;
+          display:flex;
+          flex-direction:column;
         }
         .admin-content {
-          padding: 20px;
-          overflow-y: auto;
-          background: #f8fafc;
+          padding:20px;
+          overflow-y:auto;
+          background:#f8fafc;
         }
         table {
-          width: 100%;
-          background: #fff;
-          border-collapse: collapse;
+          width:100%;
+          background:#fff;
+          border-collapse:collapse;
         }
-        th, td {
-          border: 1px solid #e2e8f0;
-          padding: 10px;
+        th,td {
+          border:1px solid #e2e8f0;
+          padding:10px;
         }
         th {
-          background: #e2e8f0;
+          background:#e2e8f0;
         }
       `}</style>
 
@@ -50,6 +78,25 @@ const UserManagementPage = () => {
           <div className="admin-content">
             <h2>User Management</h2>
 
+            {/* ⭐ Search + Filter */}
+            <div style={{ display:"flex", gap:"10px", marginBottom:"15px" }}>
+              <input
+                placeholder="Search user..."
+                value={search}
+                onChange={(e)=>setSearch(e.target.value)}
+              />
+
+              <select
+                value={roleFilter}
+                onChange={(e)=>setRoleFilter(e.target.value)}
+              >
+                <option>All</option>
+                <option>Admin</option>
+                <option>User</option>
+                <option>Author</option>
+              </select>
+            </div>
+
             <table>
               <thead>
                 <tr>
@@ -57,15 +104,42 @@ const UserManagementPage = () => {
                   <th>Email</th>
                   <th>Role</th>
                   <th>Status</th>
+                  <th>Joined</th>
                 </tr>
               </thead>
+
               <tbody>
-                {users.map(user => (
-                  <tr key={user.id}>
-                    <td>{user.name}</td>
+                {filteredUsers.map(user => (
+                  <tr key={user._id}>
+                    <td>
+                      {user.firstName} {user.lastName}
+                    </td>
+
                     <td>{user.email}</td>
-                    <td>{user.role}</td>
-                    <td>{user.status}</td>
+
+                    <td>{user.role || "User"}</td>
+
+                    <td>
+                      <span style={{
+                        padding:"4px 8px",
+                        borderRadius:"6px",
+                        background:
+                          user.status === "Banned"
+                            ? "#fee2e2"
+                            : "#dcfce7",
+                        color:
+                          user.status === "Banned"
+                            ? "#991b1b"
+                            : "#166534"
+                      }}>
+                        {user.status || "Active"}
+                      </span>
+                    </td>
+
+                    <td>
+                      {new Date(user.createdAt)
+                        .toLocaleDateString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

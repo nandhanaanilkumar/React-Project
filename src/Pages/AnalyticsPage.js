@@ -1,7 +1,33 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import AdminSidebar from "../Components/Admin/Adminsidebar";
 import AdminTopbar from "../Components/Admin/Admintopbar";
 
 const AnalyticsPage = () => {
+  const [analytics, setAnalytics] = useState(null);
+
+  const fetchAnalytics = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/admin/analytics"
+      );
+      setAnalytics(res.data);
+    } catch (err) {
+      console.log("Analytics error:", err);
+    }
+  };
+
+  // first load
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
+
+  // LIVE UPDATE every 5 sec
+  useEffect(() => {
+    const interval = setInterval(fetchAnalytics, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <style>{`
@@ -82,29 +108,35 @@ const AnalyticsPage = () => {
 
             {/* KPI Cards */}
             <div className="stats-grid">
+
               <div className="stat-card">
-                <h4>Total Views</h4>
-                <p>124,560</p>
-                <span className="trend">↑ 12% this month</span>
+                <h4>Total Users</h4>
+                <p>{analytics?.users || 0}</p>
+                <span className="trend">Live data</span>
               </div>
-              <div className="stat-card">
-                <h4>Monthly Active Users</h4>
-                <p>8,420</p>
-                <span className="trend">↑ 8% growth</span>
-              </div>
+
               <div className="stat-card">
                 <h4>Posts Published</h4>
-                <p>540</p>
-                <span className="trend">+24 this month</span>
+                <p>{analytics?.posts || 0}</p>
+                <span className="trend">Auto updating</span>
               </div>
+
               <div className="stat-card">
-                <h4>Reported Comments</h4>
-                <p>12</p>
-                <span style={{ color: "#dc2626" }}>Needs attention</span>
+                <h4>Total Comments</h4>
+                <p>{analytics?.comments || 0}</p>
+                <span className="trend">Realtime</span>
+              </div>
+
+              <div className="stat-card">
+                <h4>Reported Items</h4>
+                <p>{analytics?.reports || 0}</p>
+                <span style={{ color: "#dc2626" }}>
+                  Needs attention
+                </span>
               </div>
             </div>
 
-            {/* Traffic Summary */}
+            {/* Traffic Summary (static for now) */}
             <div className="section-card">
               <h3>Traffic Summary</h3>
 
@@ -128,49 +160,30 @@ const AnalyticsPage = () => {
               </div>
             </div>
 
-            {/* Engagement Insights */}
+            {/* Engagement */}
             <div className="section-card">
               <h3>User Engagement Insights</h3>
               <ul>
-                <li>👍 Average likes per post: 42</li>
-                <li>💬 Average comments per post: 8</li>
+                <li>
+                  👍 Average likes per post:{" "}
+                  {analytics?.avgLikes || 0}
+                </li>
+                <li>
+                  💬 Average comments per post:{" "}
+                  {analytics?.avgComments || 0}
+                </li>
                 <li>⏱ Average reading time: 4.2 mins</li>
               </ul>
             </div>
 
-            {/* Top Performing Posts */}
-            <div className="section-card">
-              <h3>Top Performing Posts</h3>
-              <table width="100%" cellPadding="10">
-                <thead>
-                  <tr>
-                    <th align="left">Post Title</th>
-                    <th align="left">Views</th>
-                    <th align="left">Engagement</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>How React Works</td>
-                    <td>12,430</td>
-                    <td>High</td>
-                  </tr>
-                  <tr>
-                    <td>Node.js Basics</td>
-                    <td>9,540</td>
-                    <td>Medium</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {/* Moderation Insights */}
+            {/* Moderation */}
             <div className="section-card">
               <h3>Moderation Insights</h3>
               <ul>
-                <li>🚫 12 comments reported</li>
-                <li>👤 3 users suspended</li>
-                <li>📝 8 posts awaiting review</li>
+                <li>
+                  🚫 {analytics?.reports || 0} reports pending
+                </li>
+                <li>📝 Live moderation enabled</li>
               </ul>
             </div>
 

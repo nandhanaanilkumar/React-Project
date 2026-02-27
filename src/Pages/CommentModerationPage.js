@@ -1,32 +1,39 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import AdminSidebar from "../Components/Admin/Adminsidebar";
 import AdminTopbar from "../Components/Admin/Admintopbar";
-
+import axios from "axios";
 const CommentModerationPage = () => {
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      user: "John Doe",
-      post: "How React Works",
-      comment: "This post is stupid!",
-      reason: "Abusive Language",
-      reportedOn: "2026-01-10",
-    },
-    {
-      id: 2,
-      user: "Jane Smith",
-      post: "Node.js Basics",
-      comment: "Spam link: buy followers here",
-      reason: "Spam",
-      reportedOn: "2026-01-11",
-    },
-  ]);
-
-  const deleteComment = (id) => {
-    if (window.confirm("Are you sure you want to delete this comment?")) {
-      setComments(comments.filter((c) => c.id !== id));
-    }
+  const [comments, setComments] = useState([]);
+const fetchComments = async () => {
+    const res = await axios.get(
+      "http://localhost:5000/admin/reports/comments"
+    );
+    setComments(res.data);
   };
+
+ useEffect(() => {
+    fetchComments();
+  }, []);
+
+
+const deleteComment = async (commentId) => {
+
+  if (!window.confirm("Delete this comment?")) return;
+
+  await axios.put(
+    `http://localhost:5000/admin/reports/comments/delete/${commentId}`
+  );
+
+  fetchComments();
+};
+
+const keepComment = async (id) => {
+  await axios.put(
+    `http://localhost:5000/admin/reports/comments/keep/${id}`
+  );
+
+  fetchComments();
+};
 
   return (
     <>
@@ -82,36 +89,52 @@ const CommentModerationPage = () => {
           <div className="admin-content">
             <h2>Reported Comments</h2>
 
-            {comments.length === 0 ? (
-              <p>No reported comments 🎉</p>
-            ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>User</th>
-                    <th>Post</th>
-                    <th>Comment</th>
-                    <th>Report Reason</th>
-                    <th>Reported On</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
+           {comments.length === 0 ? (
+            <p>No reported comments 🎉</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Post</th>
+                  <th>Comment</th>
+                  <th>Reported On</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
 
-                <tbody>
-                  {comments.map((c) => (
-                    <tr key={c.id}>
-                      <td>{c.user}</td>
-                      <td>{c.post}</td>
-                      <td>{c.comment}</td>
-                      <td>{c.reason}</td>
-                      <td>{c.reportedOn}</td>
-                      <td>
-                        <button
-                          className="delete-btn"
-                          onClick={() => deleteComment(c.id)}
-                        >
-                          Delete
-                        </button>
+              <tbody>
+                {comments.map((c) => (
+                <tr key={c.commentId}>
+                    <td>
+                      {c.user?.firstName || "User"}{" "}
+                      {c.user?.lastName || ""}
+                    </td>
+
+                    <td>{c.postText?.slice(0,30)}...</td>
+
+                    <td>{c.text}</td>
+
+                    <td>
+                      {new Date(c.createdAt).toLocaleString()}
+                    </td>
+
+                    <td>
+                      <button
+                        className="delete-btn"
+                        onClick={() =>
+                         deleteComment(c.commentId)
+                        }
+                      >
+                        Delete
+                      </button>
+
+                      <button
+                        style={{ marginLeft: "8px" }}
+                        onClick={() => keepComment(c.commentId)}
+                      >
+                        Keep
+                      </button>
                       </td>
                     </tr>
                   ))}

@@ -37,6 +37,8 @@ const styles = {
 
 const CommentBox = ({ onAdd }) => {
   const [text, setText] = useState("");
+const loggedUser =
+  JSON.parse(localStorage.getItem("loggedInUser"));
 
   const handleAdd = () => {
     if (!text.trim()) return;
@@ -54,12 +56,14 @@ const CommentBox = ({ onAdd }) => {
   return (
     <div style={styles.wrapper}>
       {/* Avatar */}
-      <img
-        src="https://via.placeholder.com/40"
-        alt="user"
-        style={styles.avatar}
-      />
-
+     <img
+  src={
+    loggedUser?.profileImage ||
+    "https://via.placeholder.com/40"
+  }
+  alt="user"
+  style={styles.avatar}
+/>
       {/* Input */}
       <input
         type="text"

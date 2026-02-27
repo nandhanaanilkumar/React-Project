@@ -1,36 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const ReportedPostsTab = () => {
-  const reportedPosts = [
-    {
-      id: 1,
-      author: "John Doe",
-      time: "2h ago",
-      content:
-        "This post contains misleading information about investments.",
-      reports: 5,
-      reason: "Fake / Misleading",
-      status: "Under Review",
-    },
-    {
-      id: 2,
-      author: "Jane Smith",
-      time: "1d ago",
-      content:
-        "This comment includes offensive language towards a group.",
-      reports: 3,
-      reason: "Hate Speech",
-      status: "Under Review",
-    },
-  ];
 
+  const [reportedPosts, setReportedPosts] = useState([]);
+
+  // FETCH FROM BACKEND
+  const fetchReportedPosts = async () => {
+    const res = await axios.get(
+      "http://localhost:5000/admin/reports/posts"
+    );
+
+    setReportedPosts(res.data);
+  };
+
+  useEffect(() => {
+    fetchReportedPosts();
+  }, []);
+console.log(reportedPosts);
   return (
     <div>
       <h3 style={{ marginBottom: "16px" }}>🚩 Reported Posts</h3>
 
       {reportedPosts.map((post) => (
         <div
-          key={post.id}
+          key={post._id}
           style={{
             background: "#fff",
             border: "1px solid #e5e7eb",
@@ -39,7 +33,8 @@ const ReportedPostsTab = () => {
             marginBottom: "16px",
           }}
         >
-          {/* Header */}
+
+          {/* HEADER */}
           <div
             style={{
               display: "flex",
@@ -48,9 +43,12 @@ const ReportedPostsTab = () => {
             }}
           >
             <div>
-              <strong>{post.author}</strong>
+              <strong>
+                {post.userId?.firstName} {post.userId?.lastName}
+              </strong>
+
               <span style={{ color: "#777", marginLeft: "8px" }}>
-                • {post.time}
+                • {new Date(post.createdAt).toLocaleString()}
               </span>
             </div>
 
@@ -63,14 +61,29 @@ const ReportedPostsTab = () => {
                 fontSize: "12px",
               }}
             >
-              {post.status}
+              {post.status || "Under Review"}
             </span>
           </div>
 
-          {/* Content */}
-          <p style={{ marginBottom: "10px" }}>{post.content}</p>
+          {/* CONTENT */}
+          <p style={{ marginBottom: "10px" }}>
+            {post.text}
+          </p>
 
-          {/* Report Info */}
+          {/* IMAGE */}
+          {post.mediaUrl && (
+            <img
+              src={post.mediaUrl}
+              alt=""
+              style={{
+                width: "100%",
+                borderRadius: "8px",
+                marginBottom: "10px",
+              }}
+            />
+          )}
+
+          {/* EXTRA INFO (LIKE FEED) */}
           <div
             style={{
               background: "#fee2e2",
@@ -81,21 +94,27 @@ const ReportedPostsTab = () => {
               marginBottom: "10px",
             }}
           >
-            🚨 {post.reports} reports • Reason: {post.reason}
+            👍 {post.likesCount || 0} Likes •
+            💬 {post.comments?.length || 0} Comments •
+            🔖 {post.saves || 0} Saves •
+            🚨 {post.reports || 0} Reports
           </div>
 
-          {/* Admin Actions */}
+          {/* ADMIN ACTIONS */}
           <div style={{ display: "flex", gap: "10px" }}>
             <button className="btn btn-sm btn-outline-danger">
               Delete
             </button>
+
             <button className="btn btn-sm btn-outline-warning">
               Hide
             </button>
+
             <button className="btn btn-sm btn-outline-secondary">
               View
             </button>
           </div>
+
         </div>
       ))}
     </div>

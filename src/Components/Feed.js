@@ -41,7 +41,7 @@ const styles = {
 
   name: {
     fontWeight: "600",
-    fontSize: "18px",
+    fontSize: "20px",
   },
 
   time: {
@@ -50,7 +50,7 @@ const styles = {
   },
 
   postText: {
-    fontSize: "18px",
+    fontSize: "20px",
     color: "#333",
     marginBottom: "12px",
     lineHeight: "1.6",
@@ -69,7 +69,7 @@ const styles = {
     justifyContent: "space-around",
     borderTop: "1px solid #eee",
     paddingTop: "10px",
-    fontSize: "14px",
+    fontSize: "20px",
     color: "#555",
     cursor: "pointer",
   },
@@ -92,100 +92,120 @@ commentList: {
 },
 
 };
-const Feed = ({searchQuery}) => {
-const [posts, setPosts] = useState([
-  {
-    id: 1,
-    name: "John Doe",
-    time: "2h • 🌍",
-    avatar: "https://via.placeholder.com/100",
-    text: "🚀 Just published a new blog on React performance optimization. Sharing some real-world tips!",
-    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
-    liked: false,
-    bookmarked: false,
-comments: [],
-showCommentBox: true
+const Feed = ({ searchQuery, searchResults }) => {
+const [posts, setPosts] = useState([]);
+const [openMenu, setOpenMenu] = useState(null);
+ useEffect(() => {
+    const fetchFeed = async () => {
+      const loggedUser = JSON.parse(
+        localStorage.getItem("loggedInUser")
+      );
 
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    time: "5h • 🌍",
-    avatar: "https://via.placeholder.com/100",
-    text: "Writing clean code is not about being clever — it’s about being readable.",
-    image: null, 
-    liked: false,
-    bookmarked: false,
-comments: [],
-showCommentBox: true
+      if (!loggedUser) return;
 
-  },
-  {
-    id: 3,
-    name: "Alex Johnson",
-    time: "1d • 🌍",
-    avatar: "https://via.placeholder.com/100",
-    text: "📸 Captured this while working late on my blogging platform project!",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-liked: false,
-bookmarked: false,
-    comments: [],
-showCommentBox: true
-    
-  },
-]);
-useEffect(() => {
-  
-  const fetchFeed = async () => {
+      const res = await fetch(
+        `http://localhost:5000/feed/${loggedUser.id}`
+      );
 
-    const loggedUser = JSON.parse(
-      localStorage.getItem("loggedInUser")
-    );
+      const data = await res.json();
 
-    const res = await fetch(
-      `http://localhost:5000/feed/${loggedUser.id}`
-    );
+console.log("FEED DATA:", data);
+    const formattedPosts =
+  (Array.isArray(data) ? data : []).map(post => ({
+      id: post._id,
+      name:
+        `${post.userId?.firstName || ""} ${
+          post.userId?.lastName || ""
+        }`,
+      avatar:
+        post.userId?.profileImage ||
+        "https://via.placeholder.com/100",
 
-    const data = await res.json();
+      text: post.text,
+      image: post.mediaUrl || null,
 
-    setPosts(data);
+      time: new Date(post.createdAt).toLocaleString(),
+
+      liked: post.isLiked || false,
+      likesCount: post.likesCount || 0,
+
+      comments: post.comments || [],
+
+      showCommentBox: false,
+    }));
+
+    setPosts(formattedPosts);
   };
 
   fetchFeed();
 
 }, []);
 
+ const toggleLike = async (id) => {
 
-  const toggleLike = (id) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === id ? { ...post, liked: !post.liked } : post
-      )
-    );
-  };
+  const loggedUser =
+    JSON.parse(localStorage.getItem("loggedInUser"));
 
+  const res = await fetch("http://localhost:5000/like", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: loggedUser.id,
+      postId: id,
+    }),
+  });
+
+  const data = await res.json();
+
+  setPosts(prev =>
+    prev.map(post =>
+      post.id === id
+        ? {
+            ...post,
+            liked: !post.liked,
+            likesCount: data.likesCount
+          }
+        : post
+    )
+  );
+};
 const toggleCommentBox = (id) => {
   setPosts(prev =>
     prev.map(post =>
       post.id === id
-        ? { ...post, showCommentBox: !post.showCommentBox }
+        ? {
+            ...post,
+            showCommentBox: !post.showCommentBox,
+          }
         : post
     )
   );
 };
 
 
-const addComment = (postId, text) => {
+const addComment = async (postId, text) => {
+
+  const loggedUser =
+    JSON.parse(localStorage.getItem("loggedInUser"));
+
+  const res = await fetch("http://localhost:5000/comment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: loggedUser.id,
+      postId,
+      text,
+    }),
+  });
+
+  const newComment = await res.json();
+
   setPosts(prev =>
     prev.map(post =>
       post.id === postId
         ? {
             ...post,
-            comments: [
-              ...post.comments,
-              { id: Date.now(), text },
-            ],
-            showCommentBox: true,
+            comments: [...post.comments, newComment],
           }
         : post
     )
@@ -198,51 +218,116 @@ const deleteComment = (postId, commentId) => {
       post.id === postId
         ? {
             ...post,
-            comments: post.comments.filter(
-              c => c.id !== commentId
+            comments: (post.comments || []).filter(
+              c => (c._id || c.id) !== commentId
             ),
           }
         : post
     )
   );
 };
+const reportPost = async (postId) => {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
 
+  await fetch("http://localhost:5000/report/post", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: user.id,
+      postId,
+    }),
+  });
+
+  setOpenMenu(null); // ⭐ CLOSE MENU
+  alert("Post reported");
+};
+
+const reportComment = async (commentId) => {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  await fetch("http://localhost:5000/report/comment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: user.id,
+      commentId,
+    }),
+  });
+
+  alert("Comment reported");
+};
 const toggleBookmark = (post) => {
+
   const savedPosts =
     JSON.parse(localStorage.getItem("bookmarkedPosts")) || [];
 
-  const isAlreadySaved = savedPosts.find(p => p.id === post.id);
+  const bookmarkPost = {
+    id: post.id,
+    name: post.name,
+    avatar: post.avatar,
+    time: post.time,
+    text: post.text,
+    image: post.image,
+    likesCount: post.likesCount || 0,
+    comments: post.comments || [],
+  };
 
-  let updatedSavedPosts;
+  const exists = savedPosts.find(p => p.id === post.id);
 
-  if (isAlreadySaved) {
-    updatedSavedPosts = savedPosts.filter(p => p.id !== post.id);
+  let updated;
+
+  if (exists) {
+    updated = savedPosts.filter(p => p.id !== post.id);
   } else {
-    updatedSavedPosts = [...savedPosts, post];
+    updated = [...savedPosts, bookmarkPost];
   }
 
   localStorage.setItem(
     "bookmarkedPosts",
-    JSON.stringify(updatedSavedPosts)
+    JSON.stringify(updated)
   );
 };
+const searchText = searchQuery?.text || "";
 
+  const filteredPosts = searchText
+    ? posts.filter(
+        p =>
+          p.text?.toLowerCase().includes(searchText.toLowerCase()) ||
+          p.name?.toLowerCase().includes(searchText.toLowerCase())
+      )
+    : posts;
+    if (searchResults?.users || searchResults?.posts) {
+    return (
+    <div style={styles.feed}>
 
-const storedPosts =
-  JSON.parse(localStorage.getItem("posts")) || posts;
+      {/* PEOPLE */}
+     {searchResults.users?.length > 0 && <h4>People</h4>}
+      {searchResults.users.map(user => (
+        <div key={user._id} style={styles.postCard}>
+          <img
+            src={user.profileImage || "https://via.placeholder.com/50"}
+            style={styles.avatar}
+            alt=""
+          />
+          <b>{user.firstName} {user.lastName}</b>
+          <p>{user.headline}</p>
+        </div>
+      ))}
 
-const filteredPosts = searchQuery
-  ? storedPosts.filter(
-      (post) =>
-        post.text
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        post.name
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase())
-    )
-  : posts;
+      {/* POSTS */}
+      <h4>Posts</h4>
+      {searchResults.posts.map(post => (
+        <div key={post._id} style={styles.postCard}>
+          <b>
+            {post.userId?.firstName} {post.userId?.lastName}
+          </b>
+          <p>{post.text}</p>
+        </div>
+      ))}
 
+    </div>
+  );
+}
   return (
     <div style={styles.feed}>
       {filteredPosts.map((post) => (
@@ -255,6 +340,26 @@ const filteredPosts = searchQuery
               <span style={styles.name}>{post.name}</span>
               <span style={styles.time}>{post.time}</span>
             </div>
+            <div style={{ marginLeft: "auto", position: "relative" }}>
+    <button
+      onClick={() => setOpenMenu(openMenu === post.id ? null : post.id)}
+      style={{
+        border: "none",
+        background: "transparent",
+        cursor: "pointer",
+        fontSize: "20px",
+      }}
+    >
+      ⋯
+    </button>
+      {openMenu === post.id && (
+    <div style={{ background: "#fff", border: "1px solid #ddd" }}>
+      <div onClick={() => reportPost(post.id)}>
+        🚩 Report Post
+      </div>
+    </div>
+  )}
+  </div>
           </div>
 
           {/* Blog Text */}
@@ -273,7 +378,7 @@ const filteredPosts = searchQuery
     style={styles.actionBtn}
     onClick={() => toggleLike(post.id)}
   >
-    👍 Like
+    👍 Like({post.likesCount || 0})
   </div>
 
   <div
@@ -281,11 +386,7 @@ const filteredPosts = searchQuery
     style={styles.actionBtn}
     onClick={() => toggleCommentBox(post.id)}
   >
-    💬 Comment ({post.comments.length})
-  </div>
-
-  <div className="btn btn-outline-secondary btn-sm" style={styles.actionBtn}>
-    Share
+    💬 Comment ({post.comments?.length || 0})
   </div>
 
   <div
@@ -305,11 +406,22 @@ const filteredPosts = searchQuery
   </div>
 )}
 <div style={styles.commentList}>
-  {post.comments.map((comment) => (
+  {(post.comments || []).map((comment) => (
     <CommentItem
-      key={comment.id}
+      key={comment._id || comment.id}
+      commentId={comment._id || comment.id}   // ⭐ IMPORTANT FIX
+      reportComment={reportComment}
       text={comment.text}
-      onDelete={() => deleteComment(post.id, comment.id)}
+      name={`${comment.userId?.firstName || ""} ${
+        comment.userId?.lastName || ""
+      }`}
+      avatar={
+        comment.userId?.profileImage ||
+        "https://via.placeholder.com/40"
+      }
+      onDelete={() =>
+        deleteComment(post.id, comment._id || comment.id)
+      }
     />
   ))}
 </div>

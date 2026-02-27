@@ -1,10 +1,59 @@
+import React, { useEffect, useState } from "react";
 import NetworkSidebar from "../Components/Network/NetworkSidebar";
 import NetworkTab from "../Components/Network/NetworkTab";
 import InvitationCard from "../Components/Network/InvitationCard";
 import NetworkGrid from "../Components/Network/NetworkGrid";
-const Network = () => {
+
+const Network = ({ searchQuery }) => {
+
+  const [people, setPeople] = useState([]);
+
+  useEffect(() => {
+
+    const fetchPeople = async () => {
+
+      const loggedUser = JSON.parse(
+        localStorage.getItem("loggedInUser")
+      );
+
+      if (!loggedUser) return;
+
+      const res = await fetch(
+        `http://localhost:5000/people/${loggedUser.id}`
+      );
+
+      const data = await res.json();
+
+      setPeople(Array.isArray(data) ? data : []);
+    };
+
+    fetchPeople();
+
+  }, []);
+
+   useEffect(() => {
+
+    const searchUsers = async () => {
+
+      // if search empty → show normal people again
+      if (!searchQuery?.text?.trim()) {
+        return;
+      }
+
+      const res = await fetch(
+        `http://localhost:5000/search?text=${searchQuery.text}`
+      );
+
+      const data = await res.json();
+
+      setPeople(data.users || []);
+    };
+
+    searchUsers();
+
+  }, [searchQuery]);
+
   return (
-    <div>
     <div
       style={{
         display: "grid",
@@ -15,17 +64,15 @@ const Network = () => {
         minHeight: "100vh",
       }}
     >
-     <div style={{ marginLeft:"80px"}}>
-      {/* LEFT SIDEBAR */}
       <NetworkSidebar />
-</div>
-      {/* CENTER CONTENT */}
-      <div style={{ maxWidth: "100%", marginLeft:"100px"}}>
+
+      <div>
         <NetworkTab />
         <InvitationCard />
-        <NetworkGrid />
+
+        {/* SEARCH RESULT PEOPLE */}
+        <NetworkGrid people={people} />
       </div>
-    </div>
     </div>
   );
 };
