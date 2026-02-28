@@ -135,18 +135,22 @@ useEffect(() => {
               e.preventDefault();
             }}
           >
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Search People or Posts"
-              style={{ width: "220px" }}
-              value={searchQuery?.text || ""}
-onChange={(e) =>
-  setSearchQuery({
-    text: e.target.value,
-    page: location.pathname,
-  })
-}            />
+<input
+  className="form-control me-2"
+  type="search"
+  placeholder="Search People or Posts"
+  style={{ width: "220px" }}
+  value={searchQuery?.text || ""}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    console.log("NAV SEARCH:", value);
+    setSearchQuery({
+      text: e.target.value,
+      page: location.pathname,
+    });
+  }}
+/>
             <button
               className="btn"
               style={{

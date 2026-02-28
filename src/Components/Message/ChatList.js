@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 
-const ChatList = ({ onSelectChat }) => {
+const ChatList = ({ onSelectChat,searchQuery }) => {
 
   const [chats, setChats] = useState([]);
+useEffect(() => {
+  console.log("CHATLIST SEARCH:", searchQuery); 
+  const fetchChats = async () => {
 
-  useEffect(() => {
+    const loggedUser =
+      JSON.parse(localStorage.getItem("loggedInUser"));
 
-    const fetchChats = async () => {
+    if (!loggedUser) return;
 
-      const loggedUser =
-        JSON.parse(localStorage.getItem("loggedInUser"));
-
-      if (!loggedUser) return;
+    if (!searchQuery?.text) {
 
       const res = await fetch(
         `http://localhost:5000/conversations/${loggedUser.id}`
@@ -20,29 +21,67 @@ const ChatList = ({ onSelectChat }) => {
       const data = await res.json();
 
       const formatted = (Array.isArray(data) ? data : [])
-  .map(c => {
+        .map(c => {
 
-    const other = c.members.find(
-      m => m._id !== loggedUser.id
-    );
+          const other = c.members.find(
+            m => m._id !== loggedUser.id
+          );
 
-    if (!other) return null; // ⭐ skip invalid chat
+          if (!other) return null;
 
-    return {
-      id: c._id,
-      name: `${other.firstName || ""} ${other.lastName || ""}`,
-      avatar: other.profileImage,
-      last: c.lastMessage || "",
-    };
-  })
-  .filter(Boolean);
+          return {
+            id: c._id,
+            name: `${other.firstName || ""} ${other.lastName || ""}`,
+            avatar: other.profileImage,
+            last: c.lastMessage || "",
+            isNew: false,
+            userId: other._id,
+          };
+        })
+        .filter(Boolean);
 
       setChats(formatted);
-    };
+      return;
+    }
 
-    fetchChats();
+    const res = await fetch(
+      `http://localhost:5000/search/messages/${loggedUser.id}?text=${searchQuery.text}`
+    );
+console.log("CALLING SEARCH API");
+    const data = await res.json();
 
-  }, []);
+const formatted = [
+
+  ...data.chats.map(c => ({
+    id: c.conversationId,
+    name: `${c.user.firstName} ${c.user.lastName}`,
+    avatar: c.user.profileImage,
+    last: c.lastMessage,
+    isNew: false,
+    isConnected: true,
+    userId: c.user._id,
+  })),
+
+  ...data.users.map(u => ({
+    id: null,
+    name: `${u.firstName} ${u.lastName}`,
+    avatar: u.profileImage,
+    last: u.isConnected
+      ? "Start conversation"
+      : "Send connection request first",
+    isNew: true,
+    isConnected: u.isConnected,
+    userId: u._id,
+  })),
+];
+
+    setChats(formatted);
+  };
+
+  fetchChats();
+
+}, [searchQuery]);
+
 
   return (
     <div style={styles.chatList}>
@@ -50,7 +89,7 @@ const ChatList = ({ onSelectChat }) => {
 
       {chats.map((chat) => (
         <div
-          key={chat.id}
+          key={chat.id || chat.userId}
           style={styles.chatItem}
           onClick={() => onSelectChat(chat)}
         >

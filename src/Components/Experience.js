@@ -1,18 +1,22 @@
+
 import React, { useEffect, useState } from "react";
 
 const Experience = () => {
   const [experiences, setExperiences] = useState([]);
   const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
-   useEffect(() => {
+  useEffect(() => {
 
-    if (!loggedUser?.id) return;
+  const loggedUser =
+    JSON.parse(localStorage.getItem("loggedInUser"));
 
-    fetch(`http://localhost:5000/experience/${loggedUser.id}`)
-      .then(res => res.json())
-      .then(data => setExperiences(data));
+  if (!loggedUser?.id) return;
 
-  }, []);
+  fetch(`http://localhost:5000/experience/${loggedUser.id}`)
+    .then(res => res.json())
+    .then(data => setExperiences(data));
+
+}, []);
 
   const addExperience = async () => {
 
@@ -56,63 +60,38 @@ const Experience = () => {
     setExperiences(updated);
   };
 
-   return (
-    <div className="bg-light py-4">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-10 col-lg-10">
-
-            <div className="card shadow-sm">
-              <div className="card-body">
-
-                <div className="d-flex justify-content-between mb-3">
-                  <h5>Experience</h5>
-                  <button
-                    className="btn btn-sm btn-outline-primary"
-                    onClick={addExperience}
-                  >
-                    + Add
-                  </button>
-                </div>
-
-                {experiences.length === 0 && (
-                  <p className="text-muted small">
-                    No experience added yet.
-                  </p>
-                )}
-
-                {experiences.map((exp, index) => (
-                  <div key={index} className="mb-3">
-
-                    <div className="d-flex justify-content-between">
-                      <h6>{exp.role}</h6>
-                      <button
-                        className="btn btn-sm btn-link"
-                        onClick={() => editExperience(exp, index)}
-                      >
-                        Edit
-                      </button>
-                    </div>
-
-                    <small className="text-muted">
-                      {exp.company}
-                    </small>
-
-                    <p className="small text-muted mb-1">
-                      {exp.duration}
-                    </p>
-
-                    <p className="small mb-0">
-                      {exp.description}
-                    </p>
-
-                    <hr />
-                  </div>
-                ))}
-
-              </div>
+  return (
+    <div className="bg-light py-2">
+      <div className="container" style={{ maxWidth: "1120px" }}>
+        <div className="card border-0 shadow-sm" style={{ borderRadius: "12px" }}>
+          <div className="card-body p-4">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h4 className="fw-bold m-0" style={{ fontSize: "22px" }}>Experience</h4>
+              <button className="btn btn-outline-primary btn-sm rounded-pill px-3" onClick={addExperience}>+ Add Experience</button>
             </div>
 
+            {experiences.length === 0 ? (
+              <p className="text-muted italic">Share your career journey by adding your roles.</p>
+            ) : (
+              experiences.map((exp, index) => (
+                <div key={index} className="mb-4 pb-4 border-bottom last-child-0">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div className="d-flex">
+                      <div className="bg-light rounded p-2 me-3 d-flex align-items-center justify-content-center" style={{ width: "54px", height: "54px" }}>
+                        🏢
+                      </div>
+                      <div>
+                        <h5 className="fw-bold mb-0" style={{ fontSize: "20px" }}>{exp.role}</h5>
+                        <div className="text-dark fw-medium" style={{ fontSize: "17px" }}>{exp.company}</div>
+                        <div className="text-muted mb-2" style={{ fontSize: "15px" }}>{exp.duration}</div>
+                        <p className="mt-2" style={{ fontSize: "17px", color: "#444", lineHeight: "1.5" }}>{exp.description}</p>
+                      </div>
+                    </div>
+                    <button className="btn btn-light btn-sm rounded-circle" onClick={() => editExperience(exp, index)}>✎</button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import ChatList from "../Components/Message/ChatList";
 import ChatWindow from "../Components/Message/Chatwindow";
 
-const MessagesPage = () => {
+const MessagesPage = ({ searchQuery, setSearchQuery }) => {
 
+  console.log("MESSAGES PAGE:", searchQuery);
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
 
@@ -43,10 +44,54 @@ const MessagesPage = () => {
 
   }, []);
 
+  const handleSelectChat = async (chat) => {
+
+  const loggedUser =
+    JSON.parse(localStorage.getItem("loggedInUser"));
+
+  if (chat.isNew && !chat.isConnected) {
+    alert("Send connection request first");
+    return;
+  }
+
+  // existing chat
+  if (!chat.isNew) {
+    setSelectedChat(chat);
+    setSearchQuery({ text: "", page: "/messages" });
+    return;
+  }
+
+  // create conversation
+  const res = await fetch(
+    "http://localhost:5000/conversation",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        senderId: loggedUser.id,
+        receiverId: chat.userId,
+      }),
+    }
+  );
+
+  const convo = await res.json();
+
+  setSelectedChat({
+    id: convo._id,
+    name: chat.name,
+    avatar: chat.avatar,
+    isNew: false,
+  });
+  setSearchQuery({ text: "", page: "/messages" });
+};
+
   return (
     <div style={styles.container}>
 
-      <ChatList onSelectChat={setSelectedChat} />
+      <ChatList onSelectChat={handleSelectChat}
+      searchQuery={searchQuery} />
 
       <ChatWindow
         selectedChat={selectedChat}

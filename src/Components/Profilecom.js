@@ -3,36 +3,51 @@ import profile from "../assets/Profile.jpg";
 import React, { useEffect, useState } from "react";
 
 const styles = {
+  container: {
+    maxWidth: "1080px",
+    margin: "0 auto",
+  },
   cover: {
-    height: "120px",
-    background: "linear-gradient(90deg, #0a66c2, #004182)",
-    borderTopLeftRadius: "10px",
-    borderTopRightRadius: "10px",
+    height: "180px",
+    background: "linear-gradient(90deg, #0a66c2 0%, #004182 100%)",
+    borderTopLeftRadius: "12px",
+    borderTopRightRadius: "12px",
   },
-
   profileSection: {
-    textAlign: "center",
-    padding: "0 20px 20px",
-    marginTop: "-60px",
+    position: "relative",
+    padding: "0 24px 24px",
+    marginTop: "-90px",
+    backgroundColor: "#fff",
+    borderBottomLeftRadius: "12px",
+    borderBottomRightRadius: "12px",
+    boxShadow: "0 0 0 1px rgba(0,0,0,0.08)",
   },
-
   profileImg: {
-    width: "120px",
-    height: "120px",
+    width: "160px",
+    height: "160px",
     borderRadius: "50%",
     border: "4px solid #ffffff",
     backgroundColor: "#ffffff",
     objectFit: "cover",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+    transition: "transform 0.3s ease",
   },
-
   name: {
-    marginTop: "30px",
-    marginBottom: "4px",
-    fontSize: "22px",
+    marginTop: "16px",
+    fontSize: "24px",
     fontWeight: "600",
-    color: "#222",
+    color: "#000",
   },
+  headline: {
+    fontSize: "16px",
+    color: "#666",
+    lineHeight: "1.5",
+  },
+  statLabel: {
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#0a66c2",
+    textDecoration: "none",
+  }
 };
 
 const Profile = () => {
@@ -128,119 +143,71 @@ const fetchPostCount = async () => {
   setPostCount(posts.length);
 };
   return (
-    <div className="bg-light py-4">
-      <div className="container">
-        <div className="row justify-content-center">
+    <div className="bg-light pb-4">
+      <div style={styles.container}>
+        <div style={styles.cover}></div>
+        <div style={styles.profileSection}>
+          <div className="d-flex justify-content-between align-items-end">
+            <img
+              src={user?.profileImage || profile}
+              alt="Profile"
+              style={styles.profileImg}
+              className="hover-zoom"
+            />
+            <button className="btn btn-outline-primary rounded-pill fw-bold px-4" onClick={() => navigate("/profileedit")}>
+              Edit Profile
+            </button>
+          </div>
 
-          <div className="col-12 col-md-10 col-lg-10 mt-7 mb-7">
+          <div className="mt-3">
+            <h1 style={styles.name}>{user?.firstName || "User"}</h1>
+            <p style={styles.headline}>{user?.headline || "Add your professional headline"}</p>
+            <p className="text-muted small">
+              <span className="me-2">📍 {user?.education || "Add education"}</span>
+            </p>
 
-      <div style={styles.cover}></div>
-        {/* Profile Card */}
-      <div style={styles.profileSection}>
-    <img
-     src={user?.profileImage || profile} 
-     alt="Profile"
-      style={styles.profileImg}
-    />
-<div>
-            <h4 style={styles.name}>
-  {user?.firstName || "User"}
-</h4>
-<p className="text-muted mb-1">
-  {user?.headline || "Add your professional headline"}
-</p>
-<p className="text-secondary small">
-  📍 {user?.education || "Add your education"}
-</p>
-            {/* Stats */}
-            <div className="row text-center mt-3">
-              <div className="col">
-         <h6
-  style={{ cursor: "pointer", color: "#0a66c2" }}
-  onClick={() => navigate("/followers")}
->
-  {followersCount}
-</h6>
-<small>Followers</small>
-
-
+            <div className="d-flex gap-4 mt-2">
+              <div style={{ cursor: "pointer" }} onClick={() => navigate("/followers")}>
+                <span style={styles.statLabel}>{followersCount}</span> <small className="text-muted">followers</small>
               </div>
-              <div className="col">
-                
-<h6
-  style={{ cursor: "pointer", color: "#0a66c2" }}
-  onClick={() => navigate("/following")}
->
-  {followingCount}
-</h6>
-<small>Following</small>
+              <div style={{ cursor: "pointer" }} onClick={() => navigate("/following")}>
+                <span style={styles.statLabel}>{followingCount}</span> <small className="text-muted">following</small>
               </div>
-              <div className="col">
-<h6>{postCount}</h6>
-                <small className="text-muted">Posts</small>
+              <div>
+                <span className="fw-bold">{postCount}</span> <small className="text-muted">posts</small>
               </div>
             </div>
-
-            {/* Actions */}
-            <div className="d-flex justify-content-center gap-2 mt-4">
-              <button className="btn btn-primary btn-sm" onClick={()=> navigate("/profileedit")}>Edit Profile</button>
-     </div>
           </div>
         </div>
 
-            {/* About */}
-            <div className="card mt-4">
-              <div className="card-body">
-                <h5>About</h5>
-                <p className="text-muted small" style={{ fontSize: "18px" }}>
-  {user?.bio || "Add something about yourself"}
-</p>
+        <div className="card mt-3 shadow-sm border-0" style={{ borderRadius: "12px" }}>
+          <div className="card-body p-4">
+            <h5 className="fw-bold">About</h5>
+            <p className="text-secondary" style={{ fontSize: "15px", lineHeight: "1.6" }}>
+              {user?.bio || "No description provided."}
+            </p>
+          </div>
+        </div>
 
-              </div>
+        <div className="card mt-3 shadow-sm border-0" style={{ borderRadius: "12px" }}>
+          <div className="card-body p-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="fw-bold m-0">Skills</h5>
+              <button className="btn btn-sm btn-outline-secondary rounded-pill" onClick={addSkill}>
+                + Add skill
+              </button>
             </div>
-
-          {/* Skills */}
-<div className="card mt-4" style={{ padding: "10px" }}>
-  <div className="card-body" style={{ padding: "20px" }}>
-    
-    <div className="d-flex justify-content-between align-items-center mb-3">
-      <h5 style={{ fontWeight: "600", fontSize: "20px" }}>
-        Skills
-      </h5>
-
-      <button
-        className="btn btn-sm btn-outline-primary"
-        style={{ fontSize: "14px", padding: "6px 14px" }}
-        onClick={addSkill}
-      >
-        + Add
-      </button>
-    </div>
-
-    <div className="mt-3">
-      {skills.map((skill, index) => (
-        <span
-          key={index}
-          className="badge bg-primary me-3 mb-3"
-          style={{
-            fontSize: "15px",
-            padding: "8px 14px",
-            borderRadius: "20px",
-          }}
-        >
-          {skill}
-        </span>
-      ))}
-    </div>
-
-  </div>
-</div>
+            <div className="d-flex flex-wrap gap-2">
+              {skills.map((skill, index) => (
+                <span key={index} className="badge border text-dark fw-normal px-3 py-2" style={{ borderRadius: "16px", backgroundColor: "#f3f6f8", fontSize: "16px" }}>
+                  {skill}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-      
     </div>
-    
   );
 };
 

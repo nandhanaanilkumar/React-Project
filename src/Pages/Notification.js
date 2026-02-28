@@ -23,8 +23,8 @@ const defaultProps = {};
 /**
  * 
  */
-const Notification = () => {
-console.log("✅ Notification page rendered");
+const Notification = ({ searchQuery }) => {
+console.log("✅ Notification page rendered with searchQuery:", searchQuery);
     return(
     <div>
         
@@ -34,7 +34,7 @@ console.log("✅ Notification page rendered");
                             <Notificationleft></Notificationleft>
                         </div>
                         <div className="col">
-                            <Notificationbar />
+                            <Notificationbar searchQuery={searchQuery}  />
                         </div>
                         <div className='col' style={{ width: "100px" }}>
                             

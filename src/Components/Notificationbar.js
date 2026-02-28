@@ -61,7 +61,7 @@ const styles = {
 };
 
 
-const Notifications = () => {
+const Notifications = ({ searchQuery }) => {
   const [notifications, setNotifications] = useState([]);
 
 useEffect(() => {
@@ -97,9 +97,21 @@ useEffect(() => {
   fetchNotifications();
 
 }, []);
+const filteredNotifications = notifications.filter((n) => {
+
+  if (!searchQuery?.text) return true;
+
+  const text = searchQuery.text.toLowerCase();
+
+  return (
+    n.name.toLowerCase().includes(text) ||
+    n.message.toLowerCase().includes(text) ||
+    n.type.toLowerCase().includes(text)
+  );
+});
   return (
     <div style={styles.container}>
-      {notifications.map((note) => (
+      {filteredNotifications.map((note) => (
         <div key={note.id} style={styles.notificationCard}>
           
           {/* Avatar */}

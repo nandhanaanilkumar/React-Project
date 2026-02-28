@@ -26,7 +26,10 @@ import FollowersPage from './Pages/FollowersPage';
 import FollowingPage from './Pages/FollowingPage';
 import ViewProfile from './Pages/ViewProfile';
 function App() {
-  const [searchQuery, setSearchQuery] = useState("");
+const [searchQuery, setSearchQuery] = useState({
+  text: "",
+  page: "",
+});
   const location = useLocation();
   const hideNavbarPaths = [
     "/",
@@ -53,8 +56,12 @@ function App() {
         <Route path="/registration" element={<Registration />} />
         <Route path="/Home" element={<Home searchQuery={searchQuery}/>} />
         <Route path="/Bio" element={<Bio />} />
-        <Route path="/notifications" element={<Notification />}></Route>
-        <Route path="/admindashboard" element={<AdminDashboard />}></Route>
+<Route
+  path="/notifications"
+  element={
+    <Notification searchQuery={searchQuery} />
+  }
+/>        <Route path="/admindashboard" element={<AdminDashboard />}></Route>
 <Route
   path="/network"
   element={<Network searchQuery={searchQuery} />}
@@ -67,8 +74,10 @@ function App() {
 <Route path="/reset-password" element={<ResetPassword />} />
 <Route path="/drafts" element={<Drafts />} />
 <Route path="/bookmarks" element={<BookmarkedPosts />} />
-     <Route path="/messages" element={<MessagesPage />} />
-     <Route path="/usermanagementpage" element={<UserManagementPage />} />
+<Route
+  path="/messages"
+  element={<MessagesPage searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
+/>     <Route path="/usermanagementpage" element={<UserManagementPage />} />
      <Route path="/commentmoderationpage" element={<CommentModerationPage />} />
     <Route path='/analytics' element={<AnalyticsPage />} />
     <Route path="/followers" element={<FollowersPage />} />
