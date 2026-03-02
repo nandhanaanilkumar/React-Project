@@ -2,13 +2,42 @@ import axios from "axios";
 
 const API = "http://localhost:5000/admin/posts";
 
-export const getPosts = () => axios.get(API);
 
-export const deletePost = (id) =>
-  axios.put(`${API}/delete/${id}`);
+// =====================
+// GET POSTS (SEARCH SUPPORT)
+// =====================
+export const getPosts = async (search = "") => {
+  return await axios.get(`${API}?search=${search}`);
+};
 
-export const hidePost = (id) =>
-  axios.put(`${API}/hide/${id}`);
 
-export const warnPost = (id) =>
-  axios.put(`${API}/warn/${id}`);
+// =====================
+// DELETE (SOFT DELETE)
+// =====================
+export const deletePost = async (id) => {
+  return await axios.delete(`${API}/${id}`);
+};
+
+
+// =====================
+// HIDE POST
+// =====================
+export const hidePost = async (id) => {
+  return await axios.patch(`${API}/${id}/hide`);
+};
+
+
+// =====================
+// WARN POST
+// =====================
+export const warnPost = async (id) => {
+  return await axios.patch(`${API}/${id}/warn`);
+};
+
+
+// =====================
+// PREVIEW POST
+// =====================
+export const previewPost = async (id) => {
+  return await axios.get(`${API}/${id}/preview`);
+};

@@ -6,7 +6,7 @@ import profile from "../assets/Profile.jpg";
 const styles = {
   sidebar: {
       width: "500px",           
-  minHeight: "520px",      
+  minHeight: "550px",      
     background: "#fff",
     borderRadius: "10px",
     border: "1px solid #004182",
@@ -18,7 +18,7 @@ const styles = {
     padding: "12px",
   },
   cover: {
-    height: "100px",
+    height: "130px",
     background: "linear-gradient(90deg, #0a66c2, #004182)",
   },
   profileSection: {
@@ -26,12 +26,13 @@ const styles = {
     padding: "0 15px 15px",
     marginTop: "-55px",
     cursor: "pointer"
+
   },
   profileImg: {
-    width: "110px",
-    height: "110px",
+    width: "180px",
+    height: "180px",
     borderRadius: "50%",
-    border: "4px solid white",
+    border: "4px solid #fff",
     background: "#fff",
     objectFit: "cover"
   },
@@ -86,18 +87,28 @@ const styles = {
 const Leftsidebar = () => {
   const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const [stats, setStats] = useState({
+  profileViewers: 0,
+  postImpressions: 0,
+});
  useEffect(() => {
 
     const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+console.log("LOGGED USER:", loggedUser);
+const userId = loggedUser?._id || loggedUser?.id;
 
-    if (!loggedUser?.id) return;
-
-    fetch(`http://localhost:5000/profile/${loggedUser.id}`)
+  if (!userId) return;
+    fetch(`http://localhost:5000/profile/${userId}`)
       .then(res => res.json())
       .then(data => setUser(data))
       .catch(err => console.log(err));
+fetch(`http://localhost:5000/profile-stats/${userId}`)
+    .then(res => res.json())
+    .then(data => setStats(data))
+    .catch(err => console.log(err));
 
-  }, []);
+}, []);
+ 
 
   return (
     <aside style={styles.sidebar}>
@@ -131,11 +142,15 @@ const Leftsidebar = () => {
       <div style={styles.stats}>
         <div style={styles.statRow}>
           <span>Profile viewers</span>
-          <span style={styles.count}>120</span>
+<span style={styles.count}>
+  {stats.profileViewers}
+</span>
         </div>
         <div style={styles.statRow}>
           <span>Post impressions</span>
-          <span style={styles.count}>1,240</span>
+       <span style={styles.count}>
+  {stats.postImpressions}
+</span>
         </div>
       </div>
 

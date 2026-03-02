@@ -46,8 +46,7 @@ const Adminsidebar = () => {
       {menuItem("👥 Users", "/usermanagementpage")}
       {menuItem("📝 Posts", "/admin/posts")}
       {menuItem("💬 Comments", "/commentmoderationpage")}
-      {menuItem("📈 Analytics", "/analytics")}
-      {menuItem("⚙️ Settings")}
+      {menuItem("📈 Analytics", "/adminanalyticspage")}
 
       {/* Spacer */}
       <div style={{ flex: 1 }} />

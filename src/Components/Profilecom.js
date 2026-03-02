@@ -197,9 +197,9 @@ const fetchPostCount = async () => {
                 + Add skill
               </button>
             </div>
-            <div className="d-flex flex-wrap gap-2">
+            <div className="d-flex flex-wrap gap-2 ">
               {skills.map((skill, index) => (
-                <span key={index} className="badge border text-dark fw-normal px-3 py-2" style={{ borderRadius: "16px", backgroundColor: "#f3f6f8", fontSize: "16px" }}>
+                <span key={index} className="badge border text-dark fw-normal px-3 py-2" style={{ borderRadius: "16px", backgroundColor: "#a5c4d9", fontSize: "18px" }}>
                   {skill}
                 </span>
               ))}

@@ -21,10 +21,10 @@ import Nav from './Components/Navbar';
 import MessagesPage from './Pages/MessagesPage';
 import UserManagementPage from './Pages/UserManagementPage';
 import CommentModerationPage from './Pages/CommentModerationPage';
-import AnalyticsPage from './Pages/AnalyticsPage';
 import FollowersPage from './Pages/FollowersPage';
 import FollowingPage from './Pages/FollowingPage';
 import ViewProfile from './Pages/ViewProfile';
+import AdminAnalyticsPage from './Pages/AdminAnalyticsPage';
 function App() {
 const [searchQuery, setSearchQuery] = useState({
   text: "",
@@ -41,7 +41,7 @@ const [searchQuery, setSearchQuery] = useState({
       "/admindashboard",
       "/usermanagementpage",
       "/commentmoderationpage",
-      "/analytics"
+        "/adminanalyticspage"
 
     ];
   const hideNavbar = hideNavbarPaths.includes(location.pathname);
@@ -79,10 +79,10 @@ const [searchQuery, setSearchQuery] = useState({
   element={<MessagesPage searchQuery={searchQuery} setSearchQuery={setSearchQuery} />}
 />     <Route path="/usermanagementpage" element={<UserManagementPage />} />
      <Route path="/commentmoderationpage" element={<CommentModerationPage />} />
-    <Route path='/analytics' element={<AnalyticsPage />} />
     <Route path="/followers" element={<FollowersPage />} />
     <Route path="/following" element={<FollowingPage />} />
      <Route path="/profile/:id" element={<ViewProfile />} />
+      <Route path="/adminanalyticspage" element={<AdminAnalyticsPage />} />
       </Routes>
     </div>
 

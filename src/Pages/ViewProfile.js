@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
+import PostCard from "./PostCard"; 
 const ViewProfile = () => {
 
   const [relation, setRelation] = useState("none");
@@ -29,6 +29,18 @@ const ViewProfile = () => {
 
       const data = await res.json();
       setUser(data);
+       if (loggedUser && loggedUser._id !== id) {
+        await fetch("http://localhost:5000/add-profile-view", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            profileId: id,
+            viewerId: loggedUser._id || loggedUser.id,
+          }),
+        });
+      }
 
       if (loggedUser) {
 
@@ -103,124 +115,117 @@ const ViewProfile = () => {
 
   if (!user) return <div>Loading...</div>;
 
-  return (
-    <div style={{ maxWidth: "900px", margin: "auto", padding: 20 }}>
+ return (
+  <div style={pageContainer}>
 
-      {/* PROFILE CARD */}
-      <div style={{
-        background:"#fff",
-        padding:20,
-        borderRadius:10,
-        boxShadow:"0 2px 6px rgba(0,0,0,0.1)"
-      }}>
+    {/* ===== PROFILE HEADER ===== */}
+    <div style={profileWrapper}>
 
+      {/* Cover */}
+      <div style={cover}></div>
+
+      <div style={profileInfo}>
         <img
           src={user.profileImage || "https://via.placeholder.com/120"}
           alt=""
-          style={{
-            width:120,
-            height:120,
-            borderRadius:"50%",
-            objectFit:"cover"
-          }}
+          style={profileImg}
         />
 
-        <h2>{user.firstName} {user.lastName}</h2>
+        <div style={{ flex: 1 }}>
+          <h2 style={{ marginBottom: 4 ,color: "#f0e9e9"}}>
+            {user.firstName} {user.lastName}
+          </h2>
 
-        <p>{user.headline}</p>
-        <p>{user.bio}</p>
+          <p style={{ color: "#555", marginBottom: 6 ,fontSize: "18px"}}>
+            {user.headline}
+          </p>
 
-        <p>
-          <b>{user.followers || 0}</b> Followers •
-          <b> {user.following || 0}</b> Following
-        </p>
+          <p style={{ color: "#666", fontSize: 16 }}>
+            {user.bio}
+          </p>
 
-        {/* RELATION BUTTONS */}
-        <div style={{ display: "flex", gap: "10px" }}>
+          <p style={{ marginTop: 10, fontWeight: 500 }}>
+            <b>{user.followers || 0}</b> Followers •{" "}
+            <b>{user.following || 0}</b> Following
+          </p>
 
-          {relation === "none" && (
-            <button style={btnPrimary} onClick={connectUser}>
-              Connect
-            </button>
-          )}
-
-          {relation === "pending_sent" && (
-            <button style={btnOutline}>
-              Pending
-            </button>
-          )}
-
-          {relation === "pending_received" && (
-            <>
-              <button style={btnPrimary} onClick={acceptRequest}>
-                Accept
+          {/* RELATION BUTTONS */}
+          <div style={buttonRow}>
+            {relation === "none" && (
+              <button style={btnPrimary} onClick={connectUser}>
+                Connect
               </button>
+            )}
 
-              <button style={btnOutline} onClick={ignoreRequest}>
-                Ignore
-              </button>
-            </>
-          )}
+            {relation === "pending_sent" && (
+              <button style={btnOutline}>Pending</button>
+            )}
 
-          {relation === "connected" && (
-            <>
-              <button
-                style={btnPrimary}
-                onClick={() => navigate("/messages")}
-              >
-                Message
-              </button>
+            {relation === "pending_received" && (
+              <>
+                <button style={btnPrimary} onClick={acceptRequest}>
+                  Accept
+                </button>
+                <button style={btnOutline} onClick={ignoreRequest}>
+                  Ignore
+                </button>
+              </>
+            )}
 
-              <button style={btnOutline}>
-                Connected
-              </button>
-            </>
-          )}
-
+            {relation === "connected" && (
+              <>
+                <button
+                  style={btnPrimary}
+                  onClick={() => navigate("/messages")}
+                >
+                  Message
+                </button>
+                <button style={btnOutline}>Connected</button>
+              </>
+            )}
+          </div>
         </div>
-
       </div>
+    </div>
 
-      {/* SKILLS */}
-      {user.skills?.length > 0 && (
-        <div style={card}>
-          <h4>Skills</h4>
-          {user.skills.map((s,i) => (
+    {/* ===== SKILLS ===== */}
+    {user.skills?.length > 0 && (
+      <div style={card}>
+        <h4>Skills</h4>
+        <div style={{ marginTop: 10 }}>
+          {user.skills.map((s, i) => (
             <span key={i} style={skill}>{s}</span>
           ))}
         </div>
-      )}
+      </div>
+    )}
 
-      {/* EXPERIENCE */}
-      {user.experience?.length > 0 && (
-        <div style={card}>
-          <h4>Experience</h4>
-          {user.experience.map((e,i) => (
-            <p key={i}>• {e}</p>
-          ))}
-        </div>
-      )}
-
-      {/* POSTS */}
+    {/* ===== EXPERIENCE ===== */}
+    {user.experience?.length > 0 && (
       <div style={card}>
-        <h4>Posts</h4>
-
-        {user.posts?.map(post => (
-          <div key={post._id}
-            style={{
-              border:"1px solid #eee",
-              padding:12,
-              borderRadius:8,
-              marginBottom:10
-            }}
-          >
-            {post.text}
-          </div>
+        <h4>Experience</h4>
+        {user.experience.map((e, i) => (
+          <p key={i} style={{ padding: "6px 0" }}>• {e}</p>
         ))}
       </div>
+    )}
 
+    {/* ===== POSTS ===== */}
+    <div style={card}>
+      <h4 style={{ marginBottom: 15 }}>Posts</h4>
+
+      {user.posts?.length > 0 ? (
+        user.posts.map((post) => (
+          <div style={postWrapper} key={post._id}>
+            <PostCard post={post} user={user} />
+          </div>
+        ))
+      ) : (
+        <p style={{ color: "#666" }}>No posts available</p>
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default ViewProfile;
@@ -228,34 +233,86 @@ export default ViewProfile;
 
 /* ================= STYLES ================= */
 
+const pageContainer = {
+  maxWidth: "1500px",
+  margin: "auto",
+  padding: 20,
+  background: "#f3f2ef",
+};
+
+const profileWrapper = {
+  background: "#fff",
+  borderRadius: 10,
+  overflow: "hidden",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+};
+
+const cover = {
+  height: 180,
+  background:
+    "linear-gradient(90deg, #1564b3 0%, #004182 100%)",
+};
+
+const profileInfo = {
+  display: "flex",
+  gap: 20,
+  padding: 20,
+  marginTop: -60,
+};
+
+const profileImg = {
+  width: 130,
+  height: 130,
+  borderRadius: "50%",
+  border: "4px solid white",
+  objectFit: "cover",
+};
+
 const card = {
-  background:"#fff",
-  marginTop:20,
-  padding:20,
-  borderRadius:10,
+  background: "#fff",
+  marginTop: 20,
+  padding: 20,
+  borderRadius: 10,
+  boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
 };
 
 const skill = {
-  background:"#0a66c2",
-  color:"#fff",
-  padding:"6px 12px",
-  borderRadius:20,
-  marginRight:10,
+  background: "#0a66c2",
+  color: "#fff",
+  padding: "6px 14px",
+  borderRadius: 20,
+  marginRight: 10,
+  display: "inline-block",
+  marginBottom: 8,
+  fontSize: 14,
+};
+
+const buttonRow = {
+  display: "flex",
+  gap: 10,
+  marginTop: 12,
 };
 
 const btnPrimary = {
-  background:"#0a66c2",
-  color:"#fff",
-  border:"none",
-  padding:"8px 16px",
-  borderRadius:"6px",
-  marginRight:"10px"
+  background: "#0a66c2",
+  color: "#fff",
+  border: "none",
+  padding: "8px 18px",
+  borderRadius: "20px",
+  cursor: "pointer",
+  fontWeight: 600,
 };
 
 const btnOutline = {
-  border:"1px solid #0a66c2",
-  color:"#0a66c2",
-  background:"white",
-  padding:"8px 16px",
-  borderRadius:"6px"
+  border: "1px solid #0a66c2",
+  color: "#0a66c2",
+  background: "white",
+  padding: "8px 18px",
+  borderRadius: "20px",
+  cursor: "pointer",
+  fontWeight: 600,
+};
+
+const postWrapper = {
+  marginBottom: 15,
 };

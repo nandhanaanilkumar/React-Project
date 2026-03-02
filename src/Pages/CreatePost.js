@@ -1,18 +1,132 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+const styles = {
+  page: {
+    background: "#f3f2ef",
+    minHeight: "100vh",
+    padding: "40px 15px",
+  },
 
+  wrapper: {
+    maxWidth: "720px",
+    margin: "0 auto",
+  },
+
+  card: {
+    background: "#fff",
+    borderRadius: "16px",
+    padding: "24px",
+    boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+  },
+
+  header: {
+    marginBottom: "15px",
+  },
+
+  title: {
+    margin: 0,
+    color: "#0a66c2",
+    fontWeight: "700",
+  },
+
+  subTitle: {
+    marginTop: "4px",
+    color: "#666",
+    fontSize: "14px",
+  },
+
+  textarea: {
+    width: "100%",
+    minHeight: "140px",
+    borderRadius: "12px",
+    border: "1px solid #d0d0d0",
+    padding: "12px",
+    fontSize: "15px",
+    outline: "none",
+    resize: "none",
+    marginBottom: "15px",
+  },
+
+  previewBox: {
+    marginBottom: "15px",
+    borderRadius: "12px",
+    overflow: "hidden",
+    border: "1px solid #eee",
+  },
+
+  previewImage: {
+    width: "100%",
+    maxHeight: "420px",
+    objectFit: "cover",
+    display: "block",
+  },
+
+  uploadLabel: {
+    display: "inline-block",
+    padding: "8px 14px",
+    borderRadius: "20px",
+    border: "1px solid #0a66c2",
+    color: "#0a66c2",
+    cursor: "pointer",
+    fontWeight: "600",
+    marginBottom: "12px",
+  },
+
+  error: {
+    color: "#d93025",
+    fontSize: "14px",
+    marginBottom: "10px",
+  },
+
+  actions: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "20px",
+  },
+
+  draftBtn: {
+    padding: "8px 14px",
+    borderRadius: "20px",
+    border: "1px solid #999",
+    background: "#fff",
+    cursor: "pointer",
+    fontWeight: "500",
+  },
+
+  cancelBtn: {
+    padding: "8px 18px",
+    borderRadius: "20px",
+    border: "none",
+    background: "#e4e6eb",
+    cursor: "pointer",
+    fontWeight: "500",
+  },
+
+  postBtn: {
+    padding: "8px 22px",
+    borderRadius: "20px",
+    border: "none",
+    background: "#0a66c2",
+    color: "#fff",
+    fontWeight: "600",
+    cursor: "pointer",
+  },
+};
 const CreatePost = () => {
   const navigate = useNavigate();
   const [content, setContent] = useState("");
   const [media, setMedia] = useState(null);
 const MAX_FILE_SIZE = 3 * 1024 * 1024;
 const [fileError, setFileError] = useState("");
-
+const [previewUrl, setPreviewUrl] = useState(null);
   useEffect(() => {
     const draft = JSON.parse(localStorage.getItem("editDraft"));
     if (draft) {
       setContent(draft.text);
-      if (draft.mediaUrl) setMedia(draft.mediaUrl);
+      if (draft.mediaUrl) 
+        setMedia(draft.mediaUrl);
+      setPreviewUrl(draft.mediaUrl);
       localStorage.removeItem("editDraft");
     }
   }, []);
@@ -145,85 +259,99 @@ const handleMediaChange = (e) => {
 
   setFileError("");
   setMedia(file);
+  setPreviewUrl(URL.createObjectURL(file));
 };
 
-  return (
-    <>
+ return (
+  <div style={styles.page}>
+    <div style={styles.wrapper}>
+      <div style={styles.card}>
 
-      <div className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-8 col-lg-7">
-            <div
-              className="card shadow-sm border-0"
-              style={{ borderRadius: "14px", borderColor:"#004182" }}
-            >
-              <div className="card-body p-4">
-                <h5 className="mb-3">Create a post</h5>
+        {/* Header */}
+        <div style={styles.header}>
+          <h4 style={styles.title}>Create Post</h4>
+          <p style={styles.subTitle}>
+            Share something with your network
+          </p>
+        </div>
 
-                <textarea
-                  className="form-control mb-3"
-                  rows="5"
-                  placeholder="What do you want to talk about?"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  style={{ borderRadius: "10px", fontSize: "15px", borderColor:"#004182" }}
-                />
+        {/* Text Area */}
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="What do you want to talk about?"
+          style={styles.textarea}
+        />
 
-                {/* 🖼️ IMAGE PREVIEW */}
-                {typeof media === "string" && (
-                  <img
-                    src={media}
-                    alt="preview"
-                    className="img-fluid rounded mb-3"
-                    style={{ maxHeight: "420px", objectFit: "cover" }}
-                  />
-                )}
-
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  className="form-control mb-3"
-onChange={handleMediaChange}
-                />
-{fileError && (
-  <div className="text-danger mb-2">
-    ⚠️ {fileError}
+        {/* Media Preview */}
+        {previewUrl && (
+  <div style={styles.previewBox}>
+    <img
+      src={previewUrl}
+      alt="preview"
+      style={styles.previewImage}
+    />
   </div>
 )}
+        {!previewUrl && media && (
+          <div style={styles.previewBox}>
+            <img
+              src={media}
+              alt="preview"
+              style={styles.previewImage}
+            />
+          </div>
+        )}
 
-                <div className="d-flex justify-content-between align-items-center mt-4">
-                  <button
-                    className="btn btn-outline-secondary"
-                    onClick={saveDraft}
-                    disabled={!content.trim()}
-                  >
-                    💾 Save Draft
-                  </button>
+        {/* Upload */}
+        <label style={styles.uploadLabel}>
+          📷 Add photo or video
+          <input
+            type="file"
+            accept="image/*,video/*"
+            onChange={handleMediaChange}
+            style={{ display: "none" }}
+          />
+        </label>
 
-                  <div className="d-flex gap-2">
-                    <button
-                      className="btn btn-light"
-                      onClick={() => navigate("/Home")}
-                    >
-                      Cancel
-                    </button>
+        {fileError && (
+          <div style={styles.error}>
+            ⚠️ {fileError}
+          </div>
+        )}
 
-                    <button
-                      className="btn btn-primary px-4"
-                      disabled={!content.trim()}
-                      onClick={handlePost}
-                    >
-                      Post
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Actions */}
+        <div style={styles.actions}>
+          <button
+            style={styles.draftBtn}
+            onClick={saveDraft}
+            disabled={!content.trim()}
+          >
+            💾 Save Draft
+          </button>
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              style={styles.cancelBtn}
+              onClick={() => navigate("/Home")}
+            >
+              Cancel
+            </button>
+
+            <button
+              style={styles.postBtn}
+              disabled={!content.trim()}
+              onClick={handlePost}
+            >
+              Post
+            </button>
           </div>
         </div>
+
       </div>
-    </>
-  );
+    </div>
+  </div>
+);
 };
 
 export default CreatePost;

@@ -116,7 +116,7 @@ const startMessage = async (receiverId) => {
       const loggedUser = JSON.parse(
         localStorage.getItem("loggedInUser")
       );
-
+  if (!loggedUser?.id) return;
       const res = await fetch(
         `http://localhost:5000/followers/${loggedUser.id}`
       );

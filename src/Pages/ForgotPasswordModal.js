@@ -88,6 +88,7 @@ const ForgotPasswordModal = ({ onClose }) => {
       VERIFY OTP
   ============================ */
   const verifyOtp = async () => {
+    console.log("VERIFY DATA:", { email, otp });
     const res = await fetch("http://localhost:5000/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

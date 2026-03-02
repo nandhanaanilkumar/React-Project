@@ -4,11 +4,12 @@ import CommentItem from "./Comment/CommentItem";
 const styles = { 
   feed: {
     width: "100%",
-    maxWidth: "1000px",          
+    maxWidth: "1250px",          
     margin: "0 auto",           
     height: "calc(100vh - 100px)",
     overflowY: "auto",
     padding: "10px",
+    
   },
 
   postCard: {
