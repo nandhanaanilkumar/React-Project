@@ -305,7 +305,7 @@ const handleMediaChange = (e) => {
 
         {/* Upload */}
         <label style={styles.uploadLabel}>
-          📷 Add photo or video
+          📷 Add photo 
           <input
             type="file"
             accept="image/*,video/*"
