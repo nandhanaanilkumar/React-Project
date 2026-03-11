@@ -42,10 +42,12 @@ const styles = {
   },
 
   postImage: {
-    width: "100%",
-    borderRadius: 8,
-    marginTop: 10
-  },
+  width: "100%",
+  borderRadius: 8,
+  marginTop: 10,
+  maxHeight: "450px",
+  objectFit: "cover"
+},
 
   actions: {
     display: "flex",
@@ -79,22 +81,35 @@ const PostCard = ({ post, user }) => {
             {user.firstName} {user.lastName}
           </h4>
           <p style={styles.headline}>{user.headline}</p>
-          <p style={styles.time}>Just now</p>
+        <p style={styles.time}>
+  {new Date(post.createdAt).toLocaleString()}
+</p>
         </div>
       </div>
 
       {/* POST CONTENT */}
-      <div style={styles.content}>
-        <p>{post.text}</p>
+     <div style={styles.content}>
+  <p>{post.text}</p>
 
-        {post.image && (
-          <img
-            src={post.image}
-            alt=""
-            style={styles.postImage}
-          />
-        )}
-      </div>
+  {post.mediaUrl && (
+    <div style={{ marginTop: 10 }}>
+      {post.mediaUrl.startsWith("data:video") ? (
+        <video
+          controls
+          style={styles.postImage}
+        >
+          <source src={post.mediaUrl} />
+        </video>
+      ) : (
+        <img
+          src={post.mediaUrl}
+          alt="post"
+          style={styles.postImage}
+        />
+      )}
+    </div>
+  )}
+</div>
 
       {/* ACTIONS (LinkedIn style) */}
       <div style={styles.actions}>

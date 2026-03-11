@@ -18,7 +18,7 @@ const styles = {
     padding: "12px",
   },
   cover: {
-    height: "130px",
+    height: "180px",
     background: "linear-gradient(90deg, #0a66c2, #004182)",
   },
   profileSection: {
@@ -102,9 +102,12 @@ const userId = loggedUser?._id || loggedUser?.id;
       .then(res => res.json())
       .then(data => setUser(data))
       .catch(err => console.log(err));
-fetch(`http://localhost:5000/profile-stats/${userId}`)
+fetch(`http://localhost:5000/user-analytics/${userId}`)
     .then(res => res.json())
-    .then(data => setStats(data))
+    .then(data => setStats({
+  profileViewers: data.profileViews,
+postImpressions: data.profileReach
+}))
     .catch(err => console.log(err));
 
 }, []);
@@ -113,7 +116,17 @@ fetch(`http://localhost:5000/profile-stats/${userId}`)
   return (
     <aside style={styles.sidebar}>
       {/* Cover */}
-      <div style={styles.cover}></div>
+     <div
+  style={{
+    ...styles.cover,
+    backgroundImage: user?.backgroundImage
+      ? `url(${user.backgroundImage})`
+      : "linear-gradient(90deg, #0a66c2, #004182)",
+       backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat"
+  }}
+></div>
 
       {/* Profile */}
       <div style={styles.profileSection}

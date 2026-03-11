@@ -114,6 +114,33 @@ const ViewProfile = () => {
   };
 
   if (!user) return <div>Loading...</div>;
+const startMessage = async () => {
+
+  const loggedUser =
+    JSON.parse(localStorage.getItem("loggedInUser"));
+ const userId = loggedUser?._id || loggedUser?.id;
+ const res = await fetch(
+    "http://localhost:5000/conversation",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        senderId: userId,
+        receiverId: id,
+      }),
+    }
+  );
+
+  const conversation = await res.json();
+
+  // store conversation to open automatically
+  localStorage.setItem(
+    "openConversation",
+    JSON.stringify(conversation)
+  );
+
+  navigate("/messages");
+};
 
  return (
   <div style={pageContainer}>
@@ -122,7 +149,17 @@ const ViewProfile = () => {
     <div style={profileWrapper}>
 
       {/* Cover */}
-      <div style={cover}></div>
+      <div
+  style={{
+    ...cover,
+    backgroundImage: user?.backgroundImage
+      ? `url(${user.backgroundImage})`
+      : "linear-gradient(90deg, #1564b3 0%, #004182 100%)",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  }}
+></div>
 
       <div style={profileInfo}>
         <img
@@ -176,7 +213,7 @@ const ViewProfile = () => {
               <>
                 <button
                   style={btnPrimary}
-                  onClick={() => navigate("/messages")}
+                  onClick={startMessage}
                 >
                   Message
                 </button>
@@ -249,8 +286,7 @@ const profileWrapper = {
 
 const cover = {
   height: 180,
-  background:
-    "linear-gradient(90deg, #1564b3 0%, #004182 100%)",
+  width:"100%"
 };
 
 const profileInfo = {

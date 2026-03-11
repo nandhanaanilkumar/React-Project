@@ -117,19 +117,27 @@ const CreatePost = () => {
   const navigate = useNavigate();
   const [content, setContent] = useState("");
   const [media, setMedia] = useState(null);
-const MAX_FILE_SIZE = 3 * 1024 * 1024;
+const MAX_FILE_SIZE = 50* 1024 * 1024;
 const [fileError, setFileError] = useState("");
 const [previewUrl, setPreviewUrl] = useState(null);
-  useEffect(() => {
-    const draft = JSON.parse(localStorage.getItem("editDraft"));
-    if (draft) {
-      setContent(draft.text);
-      if (draft.mediaUrl) 
-        setMedia(draft.mediaUrl);
-      setPreviewUrl(draft.mediaUrl);
-      localStorage.removeItem("editDraft");
-    }
-  }, []);
+ useEffect(() => {
+
+  const draftId = localStorage.getItem("editDraftId");
+
+  if (draftId) {
+
+    fetch(`http://localhost:5000/draft/${draftId}`)
+      .then(res => res.json())
+      .then(data => {
+
+        setContent(data.text);
+        setPreviewUrl(data.mediaUrl);
+
+      });
+
+  }
+
+}, []);
 
   const saveDraft = async () => {
 
@@ -180,32 +188,16 @@ const [previewUrl, setPreviewUrl] = useState(null);
 };
 
 
-  const storeDraft = (mediaUrl) => {
-    const draft = {
-      id: Date.now(),
-      text: content,
-      mediaUrl,
-      savedAt: new Date().toISOString(),
-    };
+ 
 
-    const drafts = JSON.parse(localStorage.getItem("drafts")) || [];
-    localStorage.setItem("drafts", JSON.stringify([draft, ...drafts]));
-
-    alert("Post saved as draft");
-    navigate("/drafts");
-  };
-
-  const handlePost = async () => {
+const handlePost = async () => {
 
   const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  const draftId = localStorage.getItem("editDraftId");
 
-  if (!loggedUser?.id) {
-    alert("User not found");
-    return;
-  }
+  let mediaUrl = previewUrl || null;
 
-  let mediaUrl = null;
-
+  // If new media uploaded convert to base64
   if (media) {
     const reader = new FileReader();
 
@@ -213,17 +205,31 @@ const [previewUrl, setPreviewUrl] = useState(null);
 
       mediaUrl = reader.result;
 
-      await fetch("http://localhost:5000/createPost", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userId: loggedUser.id,
-          text: content,
-          mediaUrl
-        })
-      });
+      if (draftId) {
+        await fetch(`http://localhost:5000/editPost/${draftId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: content,
+            mediaUrl
+          })
+        });
+
+        localStorage.removeItem("editDraftId");
+
+      } else {
+
+        await fetch("http://localhost:5000/createPost", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: loggedUser.id,
+            text: content,
+            mediaUrl
+          })
+        });
+
+      }
 
       navigate("/home");
     };
@@ -232,15 +238,32 @@ const [previewUrl, setPreviewUrl] = useState(null);
 
   } else {
 
-    await fetch("http://localhost:5000/createPost", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: loggedUser.id,
-        text: content,
-        mediaUrl: null
-      })
-    });
+    if (draftId) {
+
+      await fetch(`http://localhost:5000/editPost/${draftId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: content,
+          mediaUrl
+        })
+      });
+
+      localStorage.removeItem("editDraftId");
+
+    } else {
+
+      await fetch("http://localhost:5000/createPost", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: loggedUser.id,
+          text: content,
+          mediaUrl
+        })
+      });
+
+    }
 
     navigate("/home");
   }
@@ -251,7 +274,7 @@ const handleMediaChange = (e) => {
   if (!file) return;
 
   if (file.size > MAX_FILE_SIZE) {
-    setFileError("Image size must be less than 2 MB");
+    setFileError("Image size must be less than 50 MB");
     e.target.value = "";   
     setMedia(null);
     return;
@@ -284,24 +307,17 @@ const handleMediaChange = (e) => {
         />
 
         {/* Media Preview */}
-        {previewUrl && (
+       {previewUrl && (
   <div style={styles.previewBox}>
-    <img
-      src={previewUrl}
-      alt="preview"
-      style={styles.previewImage}
-    />
+    {media?.type?.startsWith("video") ? (
+      <video controls style={styles.previewImage}>
+        <source src={previewUrl} />
+      </video>
+    ) : (
+      <img src={previewUrl} alt="preview" style={styles.previewImage} />
+    )}
   </div>
 )}
-        {!previewUrl && media && (
-          <div style={styles.previewBox}>
-            <img
-              src={media}
-              alt="preview"
-              style={styles.previewImage}
-            />
-          </div>
-        )}
 
         {/* Upload */}
         <label style={styles.uploadLabel}>

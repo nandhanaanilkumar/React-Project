@@ -157,12 +157,27 @@ const handleLike = async (postId) => {
                       <p style={{ fontSize: "18px", lineHeight: "1.6", color: "#333" }}>{post.text}</p>
                     )}
 
-                    {post.mediaUrl && (
-                      <div className="rounded overflow-hidden mb-3 border">
-                        <img src={post.mediaUrl} alt="post" className="img-fluid w-100" style={{ maxHeight: "500px", objectFit: "cover" }} />
-                      </div>
-                    )}
-
+                   {post.mediaUrl && (
+  <div className="rounded overflow-hidden mb-3 border">
+    {post.mediaUrl.includes("video") ? (
+      <video
+        controls
+        className="w-100"
+        style={{ maxHeight: "500px", objectFit: "cover" }}
+      >
+        <source src={post.mediaUrl} />
+        Your browser does not support the video tag.
+      </video>
+    ) : (
+      <img
+        src={post.mediaUrl}
+        alt="post"
+        className="img-fluid w-100"
+        style={{ maxHeight: "500px", objectFit: "cover" }}
+      />
+    )}
+  </div>
+)}
                     {/* Actions */}
                     <div className="d-flex border-top pt-2">
                       <button className="btn btn-light flex-grow-1 fw-bold text-muted py-2" onClick={() => handleLike(post._id)} style={{ fontSize: "16px" }}>

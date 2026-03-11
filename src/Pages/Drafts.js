@@ -7,15 +7,20 @@ const Drafts = () => {
 useEffect(() => {
 
   const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
-
+ if (!loggedUser?.id) return;
   fetch(`http://localhost:5000/drafts/${loggedUser.id}`)
     .then(res => res.json())
-    .then(data => setDrafts(data));
+    .then(data => setDrafts(data))
+    .catch(err => console.error("Draft fetch error:", err));
 
 }, []);
 
 
  const deleteDraft = async (id) => {
+
+  const confirmDelete = window.confirm("Delete this draft?");
+
+  if (!confirmDelete) return;
 
   await fetch(`http://localhost:5000/draft/${id}`, {
     method: "DELETE"
@@ -24,15 +29,21 @@ useEffect(() => {
   setDrafts(drafts.filter(d => d._id !== id));
 };
 
-  const publishDraft = async (draft) => {
+ const publishDraft = async (draft) => {
 
-  await fetch(`http://localhost:5000/publish/${draft._id}`, {
-    method: "PUT"
-  });
+  try {
 
-  alert("🚀 Draft published");
+    await fetch(`http://localhost:5000/publish/${draft._id}`, {
+      method: "PUT"
+    });
 
-  setDrafts(drafts.filter(d => d._id !== draft._id));
+    alert("🚀 Draft published");
+
+    setDrafts(drafts.filter(d => d._id !== draft._id));
+
+  } catch (err) {
+    console.error("Publish error:", err);
+  }
 };
 
 
@@ -63,23 +74,24 @@ useEffect(() => {
             
           </div>
 
-          {draft.mediaUrl && (
-            <img
-              src={draft.mediaUrl}
-              alt="draft"
-              style={{
-                width: "100%",
-                maxHeight: "420px",
-                objectFit: "cover",
-                borderBottomLeftRadius: "12px",
-                borderBottomRightRadius: "12px",
-              }}
-            />
-          )}
+        {draft.mediaUrl && draft.mediaUrl.startsWith("data:") && (
+  <img
+    src={draft.mediaUrl}
+    alt="draft"
+    onError={(e) => (e.target.style.display = "none")}
+    style={{
+      width: "100%",
+      maxHeight: "420px",
+      objectFit: "cover",
+      borderBottomLeftRadius: "12px",
+      borderBottomRightRadius: "12px",
+    }}
+  />
+)}
 
           <div className="d-flex justify-content-between align-items-center px-3 py-2 border-top">
             <small className="text-muted">
-              Saved on {new Date(draft.savedAt).toLocaleString()}
+Saved on {new Date(draft.createdAt).toLocaleString()}
             </small>
 
             <div className="d-flex gap-2">

@@ -1,12 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
+import profile from "../../assets/Profile.jpg";
 const NetworkGrid = ({ people }) => {
   const navigate = useNavigate();
 
   return (
     <div style={styles.grid}>
       {people.map((user) => (
+        console.log("Cover:", user.backgroundImage),
         <div
           key={user._id}
           style={styles.card}
@@ -17,16 +18,27 @@ const NetworkGrid = ({ people }) => {
           onMouseLeave={(e) =>
             (e.currentTarget.style.transform = "translateY(0)")
           }
+          
         >
           {/* Top cover */}
-          <div style={styles.cover}></div>
+       <div
+  style={{
+    ...styles.cover,
+    backgroundImage: user?.backgroundImage
+      ?`url(${user.backgroundImage})`
+      : "linear-gradient(135deg,#0a66c2,#004182)",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat"
+  }}
+></div>
 
           {/* Profile Image */}
-          <img
-            src={user.profileImage || "https://via.placeholder.com/100"}
-            alt=""
-            style={styles.avatar}
-          />
+         <img
+  src={user?.profileImage ? user.profileImage : profile}
+  alt="profile"
+  style={styles.avatar}
+/>
 
           {/* Name */}
           <h4 style={styles.name}>
@@ -70,7 +82,7 @@ const styles = {
 
   cover: {
     height: "60px",
-    background: "linear-gradient(135deg,#0a66c2,#004182)",
+    width:"100%"
   },
 
   avatar: {

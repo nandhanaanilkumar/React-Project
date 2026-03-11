@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate} from "react-router-dom";
 import { useState } from "react";
+import profile from "../assets/Profile.jpg";
+
 const styles = {
   sidebar: {
       width: "500px",  
@@ -17,7 +19,7 @@ const styles = {
   },
   cover: {
     height: "100px",
-    background: "linear-gradient(90deg, #0a66c2, #004182)",
+  width:"100%"
   },
   profileSection: {
     textAlign: "center",
@@ -92,37 +94,70 @@ const styles = {
 
 const Leftsidebar = () => {
   const navigate = useNavigate();
-const [user, setUser] = useState(null);    
-    useEffect(() => {
-    const fetchProfile = async () => {
-      const loggedUser = JSON.parse(
-        localStorage.getItem("loggedInUser")
-      );
+const [user, setUser] = useState(null); 
+const [stats, setStats] = useState({
+  profileViews: 0,
+  postImpressions: 0
+});   
+   useEffect(() => {
 
-      if (!loggedUser) return;
+  const fetchData = async () => {
 
-      const res = await fetch(
-        `http://localhost:5000/profile/${loggedUser.id}`
-      );
+    const loggedUser = JSON.parse(
+      localStorage.getItem("loggedInUser")
+    );
 
-      const data = await res.json();
-      setUser(data);
-    };
+    if (!loggedUser) return;
 
-    fetchProfile();
-  }, []);
+    const userId = loggedUser._id || loggedUser.id;
+
+    // fetch profile
+    const profileRes = await fetch(
+      `http://localhost:5000/profile/${userId}`
+    );
+    const profileData = await profileRes.json();
+    setUser(profileData);
+
+    // fetch analytics
+    const statsRes = await fetch(
+      `http://localhost:5000/user-analytics/${userId}`
+    );
+
+    const statsData = await statsRes.json();
+
+    setStats({
+      profileViews: statsData.profileViews,
+      postImpressions: statsData.profileReach
+    });
+  };
+
+  fetchData();
+
+}, []);
   return (
     <div style={styles.wrapper}>
     <aside style={styles.sidebar}>
       {/* Cover */}
-      <div style={styles.cover}></div>
+    <div
+  style={{
+    ...styles.cover,
+    backgroundImage: user?.backgroundImage
+      ? user.backgroundImage.startsWith("data:image")
+        ? `url(${user.backgroundImage})` // base64 image
+        : `url(http://localhost:5000/${user.backgroundImage})` // server image
+      : "linear-gradient(135deg,#0a66c2,#004182)",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat"
+  }}
+></div>
 
       <div
   style={styles.profileSection}
   onClick={() => navigate("/Bio")}
 >
   <img
-    src={user?.profileImage || "/default-profile.png"}
+    src={user?.profileImage || profile}
     alt="Profile"
     style={styles.profileImg}
   />
@@ -143,16 +178,21 @@ const [user, setUser] = useState(null);
       <hr style={styles.hr} />
 
       {/* Stats */}
-      <div style={styles.stats}>
-        <div style={styles.statRow}>
-          <span>Profile viewers</span>
-          <span style={styles.count}>120</span>
-        </div>
-        <div style={styles.statRow}>
-          <span>Post impressions</span>
-          <span style={styles.count}>1,240</span>
-        </div>
-      </div>
+     <div style={styles.stats}>
+  <div style={styles.statRow}>
+    <span>Profile viewers</span>
+    <span style={styles.count}>
+      {stats.profileViews}
+    </span>
+  </div>
+
+  <div style={styles.statRow}>
+    <span>Post impressions</span>
+    <span style={styles.count}>
+      {stats.postImpressions}
+    </span>
+  </div>
+</div>
 
       <hr style={styles.hr} />
 

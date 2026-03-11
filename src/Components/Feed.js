@@ -367,9 +367,28 @@ const searchText = searchQuery?.text || "";
           <p style={styles.postText}>{post.text}</p>
 
           {/* Optional Image */}
-          {post.image && (
-            <img src={post.image} alt="post" style={styles.postImage} />
-          )}
+         {post.image && (
+  post.image.includes("video") ? (
+    <video
+      controls
+      style={{
+        width: "100%",
+        borderRadius: "8px",
+        marginBottom: "12px",
+        maxHeight: "450px"
+      }}
+    >
+      <source src={post.image} />
+      Your browser does not support the video tag.
+    </video>
+  ) : (
+    <img
+      src={post.image}
+      alt="post"
+      style={styles.postImage}
+    />
+  )
+)}
 {/* Actions */}
 <div style={styles.actions}>
   <div

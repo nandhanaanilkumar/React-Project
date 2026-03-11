@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
 const styles = {
 
   container: {
@@ -81,7 +82,7 @@ const styles = {
   },
 };
 const FollowersPage = () => {
-
+  const navigate = useNavigate(); 
   const [followers, setFollowers] = useState([]);
 const startMessage = async (receiverId) => {
 
@@ -108,8 +109,7 @@ const startMessage = async (receiverId) => {
     JSON.stringify(conversation)
   );
 
-  window.location.href = "/messages";
-};
+navigate("/messages");};
   useEffect(() => {
     const fetchFollowers = async () => {
 
@@ -147,15 +147,16 @@ return (
       >
 
         {/* Avatar section */}
-        <div style={styles.avatarWrapper}>
-          <img
-            src={
-              f.sender.profileImage ||
-              "https://via.placeholder.com/70"
-            }
-            alt=""
-            style={styles.avatar}
-          />
+        <div
+  style={styles.avatarWrapper}
+  onClick={() => navigate(`/profile/${f.sender._id}`)}
+>
+  <img
+    src={f.sender.profileImage || "https://via.placeholder.com/70"}
+    alt=""
+    style={styles.avatar}
+  />
+
 
           {/* Online dot */}
           <span style={styles.onlineDot}></span>

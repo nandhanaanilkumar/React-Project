@@ -10,7 +10,7 @@ const [lastName, setLastName] = useState("");
   const [bio, setBio] = useState("");
   const [photo, setPhoto] = useState(null);
     const [education, setEducation] = useState("");
-
+const [backgroundImage, setBackgroundImage] = useState(null);
   const handleBioChange = (e) => {
     if (e.target.value.length <= MAX_BIO) {
       setBio(e.target.value);
@@ -29,7 +29,19 @@ const [lastName, setLastName] = useState("");
 
   reader.readAsDataURL(file);
 };
+const handleBackgroundChange = (e) => {
 
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onloadend = () => {
+    setBackgroundImage(reader.result);
+  };
+
+  reader.readAsDataURL(file);
+};
 const handleSave = async () => {
 
   const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
@@ -50,7 +62,8 @@ const handleSave = async () => {
         headline,
         education,
         bio,
-        profileImage: photo
+        profileImage: photo,
+        backgroundImage
       })
     }
   );
@@ -97,6 +110,7 @@ useEffect(() => {
     setEducation(data.education || "");
     setBio(data.bio || "");
     setPhoto(data.profileImage || null);
+    setBackgroundImage(data.backgroundImage || null);
   };
 
   fetchProfile();
@@ -105,33 +119,89 @@ useEffect(() => {
 
 
 return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f3f4f6", padding: "40px 20px" }}>
-      <div
-        style={{
-          maxWidth: "900px",
-          margin: "0 auto",
-          background: "#fff",
-          padding: "40px",
-          borderRadius: "16px",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
-          border: "1px solid #e5e7eb",
-        }}
-      >
-        <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-          <h2 style={{ fontSize: "28px", fontWeight: "700", color: "#111827", margin: 0 }}>
-            Edit Profile
-          </h2>
-          <button 
-            className="btn btn-light" 
-            onClick={() => navigate("/bio")}
-            style={{ fontWeight: "600", color: "#6b7280" }}
-          >
-            Cancel
-          </button>
-        </div>
+  <div style={{ minHeight: "100vh", backgroundColor: "#f3f4f6", padding: "40px 20px" }}>
+    <div
+      style={{
+        maxWidth: "900px",
+        margin: "0 auto",
+        background: "#fff",
+        padding: "40px",
+        borderRadius: "16px",
+        boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
+        border: "1px solid #e5e7eb",
+      }}
+    >
+      <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <h2 style={{ fontSize: "28px", fontWeight: "700", color: "#111827", margin: 0 }}>
+          Edit Profile
+        </h2>
+        <button
+          className="btn btn-light"
+          onClick={() => navigate("/bio")}
+          style={{ fontWeight: "600", color: "#6b7280" }}
+        >
+          Cancel
+        </button>
+      </div>
 
-        {/* Profile Photo Section */}
-        <div style={{ marginBottom: "40px", textAlign: "center" }}>
+      {/* Background Cover Image */}
+      <div style={{ position: "relative", marginBottom: "80px" }}>
+        {backgroundImage ? (
+          <img
+            src={backgroundImage}
+            alt="Background"
+            style={{
+              width: "100%",
+              height: "220px",
+              objectFit: "cover",
+              borderRadius: "12px"
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: "100%",
+              height: "220px",
+              background: "#e5e7eb",
+              borderRadius: "12px"
+            }}
+          />
+        )}
+
+        {/* Upload Cover */}
+        <label
+          htmlFor="bgUpload"
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            backgroundColor: "#0a66c2",
+            color: "white",
+            padding: "8px 12px",
+            borderRadius: "20px",
+            cursor: "pointer"
+          }}
+        >
+          📷
+        </label>
+
+        <input
+          id="bgUpload"
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={handleBackgroundChange}
+        />
+
+        {/* Profile Photo Overlapping Cover */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "-70px",
+            left: "50%",
+            transform: "translateX(-50%)"
+          }}
+        >
           <div style={{ position: "relative", display: "inline-block" }}>
             {photo ? (
               <img
@@ -163,6 +233,7 @@ return (
                 👤
               </div>
             )}
+
             <label
               htmlFor="photoUpload"
               style={{
@@ -178,14 +249,12 @@ return (
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
-                border: "3px solid #fff",
-                transition: "0.2s",
+                border: "3px solid #fff"
               }}
-              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#004182")}
-              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#0a66c2")}
             >
               📷
             </label>
+
             <input
               id="photoUpload"
               type="file"
@@ -194,6 +263,8 @@ return (
               onChange={handlePhotoChange}
             />
           </div>
+        </div>
+     
           <p className="mt-2 text-muted" style={{ fontSize: "15px" }}>Click the camera icon to update photo</p>
         </div>
 
